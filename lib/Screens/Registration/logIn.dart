@@ -2,8 +2,11 @@ import 'package:first_app/Screens/Drawer/home.dart';
 import 'package:first_app/Screens/Registration/SignupPage.dart';
 import 'package:first_app/Widget/customRaisedButton.dart';
 import 'package:first_app/constants/Constantcolors.dart';
+import 'package:first_app/model/user_model.dart';
+import 'package:first_app/services/api.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/framework.dart';
+import 'package:http/http.dart' as http;
 
 class LogInPage extends StatefulWidget {
   const LogInPage({super.key});
@@ -15,6 +18,8 @@ class LogInPage extends StatefulWidget {
 class _LogInPageState extends State<LogInPage> {
   ConstantColors constantColors = ConstantColors();
   final GlobalKey<FormState> _formkey = GlobalKey<FormState>();
+  final TextEditingController _controller = TextEditingController();
+  // Future<Album>? _futureAlbum;
 
   Widget _buildLoginForm() {
     return Column(
@@ -26,6 +31,7 @@ class _LogInPageState extends State<LogInPage> {
               onTap: FocusScope.of(context).unfocus,
               keyboardType: TextInputType.emailAddress,
               textInputAction: TextInputAction.next,
+              controller: _controller,
               decoration: InputDecoration(
                   border: OutlineInputBorder(), hintText: 'Email'),
             )),
@@ -44,6 +50,9 @@ class _LogInPageState extends State<LogInPage> {
           padding: const EdgeInsets.all(40),
           child: GestureDetector(
               onTap: () {
+                setState(() {
+                  // _futureAlbum = createAlbum(_controller.text);
+                });
                 FocusScope.of(context).unfocus();
                 Navigator.pushReplacement(context,
                     MaterialPageRoute(builder: (context) => HomeScreen()));

@@ -2,6 +2,7 @@ import 'package:first_app/Widget/buttomAppBar.dart';
 import 'package:first_app/Screens/Drawer/settingPage.dart';
 import 'package:first_app/constants/Constantcolors.dart';
 import 'package:first_app/main.dart';
+import 'package:first_app/model/user_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/framework.dart';
 
@@ -15,6 +16,7 @@ class ProfilePage extends StatefulWidget {
 class _ProfilePageState extends State<ProfilePage>
     with TickerProviderStateMixin {
   ConstantColors constantColors = ConstantColors();
+  // Future<Album>? _futureAlbum;
 
   Widget yourFeed() {
     return Container(
@@ -25,6 +27,18 @@ class _ProfilePageState extends State<ProfilePage>
       ),
     );
   }
+
+  // FutureBuilder<Album> buildFutureBuilder() {
+  //   return FutureBuilder<Album>(
+  //       future: _futureAlbum,
+  //       builder: (context, snapshot) {
+  //         if (snapshot.hasData) {
+  //           return Text(snapshot.data!.name);
+  //         } else {
+  //           return Text('${snapshot.error}');
+  //         }
+  //       });
+  // }
 
   late TabController _tabController;
 
@@ -72,8 +86,10 @@ class _ProfilePageState extends State<ProfilePage>
                 // SizedBox(
                 //   height: 10,
                 // ),
+
                 Text(
                   'Vandan',
+                  // '$buildFutureBuilder()',
                   style: TextStyle(
                       fontSize: MediaQuery.of(context).size.height * 0.03,
                       color: constantColors.greyColor,
