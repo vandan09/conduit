@@ -3,6 +3,7 @@ import 'package:first_app/Widget/customRaisedButton.dart';
 import 'package:first_app/constants/Constantcolors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/framework.dart';
+import 'package:textfield_tags/textfield_tags.dart';
 
 class NewArticlePage extends StatefulWidget {
   const NewArticlePage({super.key});
@@ -73,14 +74,25 @@ class _NewArticlePageState extends State<NewArticlePage> {
             height: 20,
           ),
           Container(
-              margin: EdgeInsets.fromLTRB(30, 0, 30, 0),
-              child: TextField(
-                onTap: FocusScope.of(context).unfocus,
-                keyboardType: TextInputType.text,
-                textInputAction: TextInputAction.next,
-                decoration: InputDecoration(
-                    border: OutlineInputBorder(), hintText: 'Enter tags'),
-              )),
+            margin: EdgeInsets.fromLTRB(30, 0, 30, 0),
+            child: TextField(
+              onTap: FocusScope.of(context).unfocus,
+              keyboardType: TextInputType.text,
+              textInputAction: TextInputAction.next,
+              decoration: InputDecoration(
+                  border: OutlineInputBorder(), hintText: 'Enter tags'),
+            ),
+          ),
+          // TextFieldTags(
+          //   textSeparators: [" ", ','],
+          //   initialTags: ['flutter', 'fluttercamp'],
+          //   validator: (tag) {
+          //     if (tag.length < 3) {
+          //       return 'Enter tag up to 3 characters';
+          //     }
+          //     return null;
+          //   },
+          // ),
           Padding(
             padding: const EdgeInsets.all(40),
             child: GestureDetector(

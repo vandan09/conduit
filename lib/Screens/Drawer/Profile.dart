@@ -1,5 +1,6 @@
+import 'package:first_app/Screens/Drawer/setting_page.dart';
 import 'package:first_app/Widget/buttomAppBar.dart';
-import 'package:first_app/Screens/Drawer/settingPage.dart';
+// import 'package:first_app/Screens/Drawer/setting_page.dart'';
 import 'package:first_app/constants/Constantcolors.dart';
 import 'package:first_app/main.dart';
 import 'package:first_app/model/user_model.dart';

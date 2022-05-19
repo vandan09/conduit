@@ -1,10 +1,11 @@
 import 'package:first_app/Screens/Drawer/profile.dart';
 import 'package:first_app/Screens/Drawer/new_article.dart';
 import 'package:first_app/Screens/ReadMorePage.dart';
-import 'package:first_app/Screens/clientProfile.dart';
+import 'package:first_app/Screens/client_profile.dart';
+// import 'package:first_app/Screens/client_profile.dart'';
 import 'package:first_app/Screens/tag_screen.dart';
 import 'package:first_app/Widget/buttomAppBar.dart';
-import 'package:first_app/Screens/Drawer/settingPage.dart';
+import 'package:first_app/Screens/Drawer/setting_page.dart';
 import 'package:first_app/constants/Constantcolors.dart';
 import 'package:first_app/main.dart';
 import 'package:flutter/material.dart';

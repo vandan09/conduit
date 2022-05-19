@@ -1,44 +1,53 @@
+import 'package:first_app/Screens/Drawer/home.dart';
+import 'package:first_app/Screens/Registration/signup_page.dart';
 import 'package:first_app/Widget/customRaisedButton.dart';
-import 'package:first_app/Screens/Registration/logIn.dart';
 import 'package:first_app/constants/Constantcolors.dart';
+import 'package:first_app/model/user_model.dart';
+import 'package:first_app/services/api.dart';
+import 'package:first_app/utils/validation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/framework.dart';
+import 'package:http/http.dart' as http;
 
-class SignupPage extends StatefulWidget {
-  const SignupPage({super.key});
+class LogInPage extends StatefulWidget {
+  const LogInPage({super.key});
 
   @override
-  State<SignupPage> createState() => _SignupPageState();
+  State<LogInPage> createState() => _LogInPageState();
 }
 
-class _SignupPageState extends State<SignupPage> {
+class _LogInPageState extends State<LogInPage> {
   ConstantColors constantColors = ConstantColors();
+  final GlobalKey<FormState> _formkey = GlobalKey<FormState>();
+  final TextEditingController _controller = TextEditingController();
+  // Future<Album>? _futureAlbum;
+  String? _userEmail, _password;
 
-  @override
   Widget _buildLoginForm() {
     return Column(
       children: [
         // Email Text Field
         Container(
             margin: EdgeInsets.fromLTRB(30, 80, 30, 0),
-            child: TextField(
-              keyboardType: TextInputType.text,
-              textInputAction: TextInputAction.next,
-              decoration: InputDecoration(
-                  border: OutlineInputBorder(), hintText: 'Username'),
-            )),
-        Container(
-            margin: EdgeInsets.fromLTRB(30, 30, 30, 0),
-            child: TextField(
+            child: TextFormField(
+              autofocus: false,
+              onSaved: (value) => _userEmail = value,
+              validator: validateEmail,
               keyboardType: TextInputType.emailAddress,
               textInputAction: TextInputAction.next,
+              controller: _controller,
               decoration: InputDecoration(
                   border: OutlineInputBorder(), hintText: 'Email'),
             )),
         //password
         Container(
             margin: EdgeInsets.fromLTRB(30, 30, 30, 0),
-            child: TextField(
+            child: TextFormField(
+              onTap: FocusScope.of(context).unfocus,
+              autofocus: false,
+              validator: (value) =>
+                  value!.isEmpty ? "Please enter password" : null,
+              onSaved: (value) => _password = value,
               obscureText: true,
               keyboardType: TextInputType.visiblePassword,
               decoration: InputDecoration(
@@ -49,17 +58,22 @@ class _SignupPageState extends State<SignupPage> {
           padding: const EdgeInsets.all(40),
           child: GestureDetector(
               onTap: () {
+                setState(() {
+                  // _futureAlbum = createAlbum(_controller.text);
+                });
+                FocusScope.of(context).unfocus();
                 Navigator.pushReplacement(context,
-                    MaterialPageRoute(builder: (context) => LogInPage()));
+                    MaterialPageRoute(builder: (context) => HomeScreen()));
               },
               child: CustomRaisedButton(
-                buttonText: 'Sign up',
+                buttonText: 'Sign in',
               )),
         ),
       ],
     );
   }
 
+  @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
@@ -69,6 +83,7 @@ class _SignupPageState extends State<SignupPage> {
         height: MediaQuery.of(context).size.height,
         child: Form(
           autovalidateMode: AutovalidateMode.always,
+          key: _formkey,
           child: SingleChildScrollView(
             child: Stack(
               children: [
@@ -76,7 +91,7 @@ class _SignupPageState extends State<SignupPage> {
                 Center(
                   child: Container(
                     margin: EdgeInsets.symmetric(vertical: 150),
-                    child: Text('Sign up',
+                    child: Text('Sign in',
                         style: TextStyle(
                             color: constantColors.darkColor,
                             fontSize: 30,
@@ -98,15 +113,14 @@ class _SignupPageState extends State<SignupPage> {
                     children: <Widget>[
                       GestureDetector(
                         onTap: () {
-                          Navigator.push(context, MaterialPageRoute(
-                            builder: (BuildContext context) {
-                              return LogInPage();
-                            },
-                          ));
+                          Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => SignupPage()));
                         },
                         child: Container(
                           child: Text(
-                            'Have an account?',
+                            'Need an account?',
                             style: TextStyle(
                               color: constantColors.greenColor,
                               fontSize: 15,

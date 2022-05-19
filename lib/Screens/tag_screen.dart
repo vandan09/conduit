@@ -1,5 +1,5 @@
 import 'package:first_app/Screens/ReadMorePage.dart';
-import 'package:first_app/Screens/clientProfile.dart';
+import 'package:first_app/Screens/client_profile.dart';
 import 'package:first_app/constants/Constantcolors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/framework.dart';
