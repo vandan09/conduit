@@ -1,10 +1,11 @@
-import 'package:first_app/Screens/ReadMorePage.dart';
-import 'package:first_app/Screens/client_profile.dart';
+import 'package:first_app/Screens/others/client_profile.dart';
+import 'package:first_app/Screens/others/readmore_page.dart';
+import 'package:first_app/Screens/others/client_profile.dart';
 import 'package:first_app/constants/Constantcolors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/framework.dart';
 
-import '../Widget/buttomAppBar.dart';
+import '../../Widget/buttomAppBar.dart';
 
 class TagScreen extends StatefulWidget {
   final String tagName;
@@ -113,11 +114,11 @@ class _TagScreenState extends State<TagScreen> {
                       ),
                       title: GestureDetector(
                         onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => ClientProfilePapge()),
-                          );
+                          // Navigator.push(
+                          //   context,
+                          //   MaterialPageRoute(
+                          //       builder: (context) => ClientProfilePapge()),
+                          // );
                         },
                         child: Text(
                           'Gerome',
@@ -151,10 +152,10 @@ class _TagScreenState extends State<TagScreen> {
                           )),
                           GestureDetector(
                               onTap: () {
-                                Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) => ReadMorePage()));
+                                // Navigator.push(
+                                //     context,
+                                //     MaterialPageRoute(
+                                //         builder: (context) => ReadMorePage()));
                               },
                               child: Text(
                                 'Read more...',

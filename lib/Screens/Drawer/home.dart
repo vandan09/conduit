@@ -1,14 +1,32 @@
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:carousel_slider/carousel_slider.dart';
 import 'package:first_app/Screens/Drawer/profile.dart';
 import 'package:first_app/Screens/Drawer/new_article.dart';
-import 'package:first_app/Screens/ReadMorePage.dart';
-import 'package:first_app/Screens/client_profile.dart';
+import 'package:first_app/Screens/others/client_profile.dart';
+import 'package:first_app/Screens/others/readmore_page.dart';
+import 'package:first_app/Screens/others/tag_screen.dart';
+// import 'package:first_app/Screens/others/readmore_page.dart'le.dart';?
+// import 'package:first_app/Screens/others/readmore_page.dart';??
+// import 'package:first_app/Screens/others/others/client_profile.dart';
 // import 'package:first_app/Screens/client_profile.dart'';
-import 'package:first_app/Screens/tag_screen.dart';
+// import 'package:first_app/Screens/others/tag_screen.dart'n.dart';
 import 'package:first_app/Widget/buttomAppBar.dart';
 import 'package:first_app/Screens/Drawer/setting_page.dart';
 import 'package:first_app/constants/Constantcolors.dart';
 import 'package:first_app/main.dart';
+import 'package:first_app/model/article_model.dart';
+import 'package:first_app/services/api.dart';
 import 'package:flutter/material.dart';
+import 'package:readmore/readmore.dart';
+// import 'package:cached_network_image/cached_network_image.dart';
+
+final List<String> imgList = [
+  'assets/images/a.jpg',
+  'assets/images/c2.jpg',
+  'assets/images/c3.jpg',
+  'assets/images/c4.jpg',
+  'assets/images/c5.jpg'
+];
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -19,12 +37,56 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   ConstantColors constantColors = ConstantColors();
+
+  Future<Welcome>? _articleModel;
+  @override
+  void initState() {
+    _articleModel = API_Manager().getArtciles();
+    _tabController = new TabController(length: 2, vsync: this);
+
+    super.initState();
+  }
+
   String selected = "Global Feed";
 
   String selectDrawer = 'home';
 
   final check = List.generate(10, (index) => index * 2);
   final tagName = ['welcome', 'implementation', 'introduction', 'codeBaseShow'];
+
+  final List<Widget> imageSliders = imgList
+      .map((item) => Container(
+            child: Container(
+              margin: EdgeInsets.all(5.0),
+              child: ClipRRect(
+                  borderRadius: BorderRadius.all(Radius.circular(0.0)),
+                  child: Stack(
+                    children: <Widget>[
+                      Image.asset(item, fit: BoxFit.cover, width: 1000.0),
+                      Positioned(
+                        bottom: 0.0,
+                        left: 0.0,
+                        right: 0.0,
+                        child: Container(
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              colors: [
+                                Color.fromARGB(200, 0, 0, 0),
+                                Color.fromARGB(0, 0, 0, 0)
+                              ],
+                              begin: Alignment.bottomCenter,
+                              end: Alignment.topCenter,
+                            ),
+                          ),
+                          padding: EdgeInsets.symmetric(
+                              vertical: 5.0, horizontal: 20.0),
+                        ),
+                      ),
+                    ],
+                  )),
+            ),
+          ))
+      .toList();
 
   int? selectedIndex;
   _setIndex(int index) {
@@ -49,6 +111,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
   Widget yourFeed() {
     return Container(
+      height: 20,
       padding: EdgeInsets.all(20),
       // margin: EdgeInsets.only(right: 10, top: 20),
       child: Text(
@@ -59,264 +122,332 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   }
 
   Widget customerListView() {
-    return Column(
-      children: [
-        ListView.builder(
-            physics: NeverScrollableScrollPhysics(),
-            shrinkWrap: true,
-            itemCount: 3,
-            itemBuilder: ((context, index) {
-              return Padding(
-                padding: const EdgeInsets.only(top: 15.0, left: 15, right: 15),
-                child: Card(
-                    child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                      ListTile(
-                        trailing: GestureDetector(
-                          onTap: () {
-                            setState(() {
-                              _setIndex(index);
-                            });
-                          },
-                          onLongPress: () {
-                            setState(() {
-                              _unSet(index);
-                            });
-                          },
-                          child: Container(
-                            decoration: BoxDecoration(
-                                color: _checkColor(index)
-                                    ? constantColors.greenColor
-                                    : constantColors.whiteColor,
-                                // _checkColor(index);
-                                border: Border.all(
-                                    color: constantColors.greenColor),
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(5))),
-                            // alignment: AlignmentDirectional.center,
-                            // alignment: Alignment.topRight,
-                            height: 35,
-                            width: 80,
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(
-                                  Icons.favorite,
-                                  color: _checkColor(index)
-                                      ? constantColors.whiteColor
-                                      : constantColors.greenColor,
-                                  size: 20,
+    return SingleChildScrollView(
+      child: Column(
+        children: [
+          FutureBuilder<Welcome>(
+            future: _articleModel,
+            builder: (context, snapshot) {
+              if (snapshot.hasData) {
+                return ListView.builder(
+                    physics: NeverScrollableScrollPhysics(),
+                    shrinkWrap: true,
+                    itemCount: snapshot.data!.articles.length,
+                    itemBuilder: ((context, index) {
+                      var article = snapshot.data!.articles[index];
+                      String authorName = article.author;
+                      String result =
+                          authorName.substring(0, authorName.indexOf(' '));
+                      return Padding(
+                        padding: const EdgeInsets.only(
+                            top: 15.0, left: 15, right: 15),
+                        child: Card(
+                            child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                              // CachedNetworkImage(),
+                              ListTile(
+                                // like button
+                                trailing: GestureDetector(
+                                  onTap: () {
+                                    setState(() {
+                                      _setIndex(index);
+                                    });
+                                  },
+                                  onLongPress: () {
+                                    setState(() {
+                                      _unSet(index);
+                                    });
+                                  },
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                        color: _checkColor(index)
+                                            ? constantColors.greenColor
+                                            : constantColors.whiteColor,
+                                        // _checkColor(index);
+                                        border: Border.all(
+                                            color: constantColors.greenColor),
+                                        borderRadius: BorderRadius.all(
+                                            Radius.circular(5))),
+                                    // alignment: AlignmentDirectional.center,
+                                    // alignment: Alignment.topRight,
+                                    height: 35,
+                                    width: 80,
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        Icon(
+                                          Icons.favorite,
+                                          color: _checkColor(index)
+                                              ? constantColors.whiteColor
+                                              : constantColors.greenColor,
+                                          size: 20,
+                                        ),
+                                        SizedBox(
+                                          width: 2,
+                                        ),
+                                        Text(
+                                          '20',
+                                          style: TextStyle(
+                                              color: _checkColor(index)
+                                                  ? constantColors.whiteColor
+                                                  : constantColors.greenColor,
+                                              fontSize: 16),
+                                        )
+                                      ],
+                                    ),
+                                  ),
                                 ),
-                                SizedBox(
-                                  width: 2,
+                                // author image
+                                // leading: Container(decoration: BoxDecoration(image: Cach()),),
+                                // leading: CachedNetworkImage(
+                                //   imageUrl: article.urlToImage,
+                                //   placeholder:
+                                //       (BuildContext context, String url) =>
+                                //           Container(
+                                //     width: 20,
+                                //     height: 20,
+                                //     color: Colors.purple,
+                                //   ),
+                                // ),
+                                leading: CachedNetworkImage(
+                                  width: 50,
+                                  height: 50,
+                                  imageBuilder: (context, imageProvider) =>
+                                      Container(
+                                    width: 80.0,
+                                    height: 80.0,
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      image: DecorationImage(
+                                          image: imageProvider,
+                                          fit: BoxFit.cover),
+                                    ),
+                                  ),
+                                  progressIndicatorBuilder:
+                                      (context, url, progress) => Center(
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 5,
+                                      color: constantColors.greenColor,
+                                      value: progress.progress,
+                                    ),
+                                  ),
+                                  imageUrl: article.urlToImage,
                                 ),
-                                Text(
-                                  '20',
-                                  style: TextStyle(
-                                      color: _checkColor(index)
-                                          ? constantColors.whiteColor
-                                          : constantColors.greenColor,
-                                      fontSize: 16),
-                                )
-                              ],
-                            ),
-                          ),
-                        ),
-                        leading: CircleAvatar(
-                          backgroundImage:
-                              AssetImage('assets/images/demo-avatar.png'),
-                        ),
-                        title: GestureDetector(
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => ClientProfilePapge()),
-                            );
-                          },
-                          child: Text(
-                            'Gerome',
-                            style: TextStyle(color: constantColors.greenColor),
-                          ),
-                        ),
-                        subtitle: Text(
-                          'November 24,2001',
-                          style: TextStyle(
-                              color: constantColors.greyColor, fontSize: 12),
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 20),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            GestureDetector(
-                                child: Text(
-                              'Create new implementation',
-                              style: TextStyle(
-                                  color: constantColors.darkColor,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 18),
-                            )),
-                            GestureDetector(
-                                child: Text(
-                              'Join the community by creating a new implementation',
-                              style: TextStyle(
-                                  color: constantColors.greyColor,
-                                  fontSize: 14),
-                            )),
-                            GestureDetector(
-                                onTap: () {
-                                  Navigator.push(
+
+                                //author name
+
+                                title: GestureDetector(
+                                  onTap: () {
+                                    Navigator.push(
                                       context,
                                       MaterialPageRoute(
                                           builder: (context) =>
-                                              ReadMorePage()));
-                                },
-                                child: Text(
-                                  'Read more...',
-                                  style: TextStyle(
-                                      color: Colors.grey.shade400,
-                                      fontSize: 13),
-                                )),
-                            SizedBox(
-                              height: 5,
-                            ),
-                            GestureDetector(
-                                onTap: () {},
-                                child: Container(
-                                  padding: EdgeInsets.all(3),
-                                  decoration: BoxDecoration(
-                                      border: Border.all(
-                                        color: Colors.grey.shade400,
-                                      ),
-                                      borderRadius: BorderRadius.circular(30)),
+                                              ClientProfilePapge(
+                                                  result, article.urlToImage)),
+                                    );
+                                  },
                                   child: Text(
-                                    'implementations',
+                                    result,
                                     style: TextStyle(
-                                        color: Colors.grey.shade400,
-                                        fontSize: 13),
+                                        color: constantColors.greenColor),
                                   ),
-                                )),
-                            SizedBox(
-                              height: 10,
-                            ),
-                          ],
-                        ),
-                      ),
-                      SizedBox(
-                        height: 10,
-                      )
-                    ])),
-              );
-            })),
-        // SizedBox(
-        //   height: 100,
-        //   width: 100,
-        //   child: ListView.builder(
-        //     itemBuilder: (context, index) {
-        //       return Row();
-        //       // return Container(
-        //       // width: MediaQuery.of(context).size.width,
-        //       // child: Row(
-        //     },
-        //   ),
-        // ),
-        Padding(
-          padding: const EdgeInsets.only(top: 20.0, right: 20, left: 20),
-          child: Container(
-            padding: EdgeInsets.only(top: 5),
-            alignment: Alignment.center,
-            child: Text(
-              "Popular Tags",
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            decoration: BoxDecoration(
-              color: Colors.grey.shade300,
-              border: Border.all(color: Colors.grey.shade300),
-              borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(5), topRight: Radius.circular(5)),
-            ),
-            // padding: EdgeInsets.all(15),
-            height: MediaQuery.of(context).size.height * 0.05,
-            width: MediaQuery.of(context).size.width,
+                                ),
+                                //date
+                                subtitle: Text(
+                                  '${article.publishedAt.month}/${article.publishedAt.day}/${article.publishedAt.year}',
+                                  style: TextStyle(
+                                      color: constantColors.greyColor,
+                                      fontSize: 12),
+                                ),
+                              ),
+                              Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 20),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    //title
+                                    GestureDetector(
+                                        onTap: () {
+                                          Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      ReadMorePage(
+                                                          article.title,
+                                                          result,
+                                                          article.description,
+                                                          article.publishedAt,
+                                                          article.urlToImage)));
+                                        },
+                                        child: Text(
+                                          article.title,
+                                          style: TextStyle(
+                                              color: constantColors.darkColor,
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 18),
+                                        )),
+                                    //descripton
+                                    GestureDetector(
+                                        child: ReadMoreText(
+                                      trimLines: 2,
+                                      colorClickableText:
+                                          constantColors.greenColor,
+                                      trimMode: TrimMode.Line,
+                                      trimCollapsedText: 'Read more',
+                                      trimExpandedText: ' Show less',
+                                      article.description,
+                                      style: TextStyle(
+                                          color: constantColors.greyColor,
+                                          fontSize: 14),
+                                    )),
+                                    // //read more link
+                                    // GestureDetector(
+                                    //     onTap: () {
+                                    //       Navigator.push(
+                                    //           context,
+                                    //           MaterialPageRoute(
+                                    //               builder: (context) =>
+                                    //                   ReadMorePage()));
+                                    //     },
+                                    //     child: Text(
+                                    //       'Read more...',
+                                    //       style: TextStyle(
+                                    //           color: Colors.grey.shade400,
+                                    //           fontSize: 13),
+                                    //     )),
+                                    SizedBox(
+                                      height: 10,
+                                    ),
+                                    //articles tags
+                                    GestureDetector(
+                                        onTap: () {},
+                                        child: Container(
+                                          padding: EdgeInsets.all(3),
+                                          decoration: BoxDecoration(
+                                              border: Border.all(
+                                                color: Colors.grey.shade400,
+                                              ),
+                                              borderRadius:
+                                                  BorderRadius.circular(30)),
+                                          child: Text(
+                                            'implementations',
+                                            style: TextStyle(
+                                                color: Colors.grey.shade400,
+                                                fontSize: 13),
+                                          ),
+                                        )),
+                                    SizedBox(
+                                      height: 10,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              SizedBox(
+                                height: 10,
+                              )
+                            ])),
+                      );
+                    }));
+              } else {
+                return Center(
+                    child: CircularProgressIndicator(
+                        color: constantColors.greenColor));
+              }
+            },
           ),
-        ),
-        Padding(
-          padding: const EdgeInsets.only(right: 20, left: 20, bottom: 20),
-          child: Container(
-            decoration: BoxDecoration(
+          //popular tags
+          Padding(
+            padding: const EdgeInsets.only(top: 20.0, right: 20, left: 20),
+            child: Container(
+              padding: EdgeInsets.only(top: 5),
+              alignment: Alignment.center,
+              child: Text(
+                "Popular Tags",
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              decoration: BoxDecoration(
                 color: Colors.grey.shade300,
                 border: Border.all(color: Colors.grey.shade300),
                 borderRadius: BorderRadius.only(
-                    bottomLeft: Radius.circular(5),
-                    bottomRight: Radius.circular(5))),
-            padding: EdgeInsets.all(15),
-            height: MediaQuery.of(context).size.height * 0.15,
-            width: MediaQuery.of(context).size.width,
-            child: ListView.builder(
-              shrinkWrap: true,
-              scrollDirection: Axis.horizontal,
-              itemCount: tagName.length,
-              itemBuilder: (context, index) {
-                return Row(
-                  children: [
-                    Wrap(
-                      alignment: WrapAlignment.spaceBetween,
-                      direction: Axis.horizontal,
-                      runSpacing: 10,
-                      children: <Widget>[
-                        GestureDetector(
-                          onTap: () {
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => TagScreen(
-                                          '${tagName[index]}',
-                                        )));
-                          },
-                          child: Container(
-                            margin: const EdgeInsets.fromLTRB(0, 0, 10, 0),
-                            child: Text(tagName[index]),
-                            decoration: BoxDecoration(
-                                color: Colors.white,
-                                border: Border.all(color: Colors.grey.shade300),
-                                borderRadius: BorderRadius.circular(30)),
-                            padding: EdgeInsets.fromLTRB(12, 12, 12, 12),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                );
-              },
+                    topLeft: Radius.circular(5), topRight: Radius.circular(5)),
+              ),
+              // padding: EdgeInsets.all(15),
+              height: MediaQuery.of(context).size.height * 0.05,
+              width: MediaQuery.of(context).size.width,
             ),
           ),
-        ),
-      ],
+          Padding(
+            padding: const EdgeInsets.only(right: 20, left: 20, bottom: 20),
+            child: Container(
+              decoration: BoxDecoration(
+                  color: Colors.grey.shade300,
+                  border: Border.all(color: Colors.grey.shade300),
+                  borderRadius: BorderRadius.only(
+                      bottomLeft: Radius.circular(5),
+                      bottomRight: Radius.circular(5))),
+              padding: EdgeInsets.all(15),
+              height: MediaQuery.of(context).size.height * 0.15,
+              width: MediaQuery.of(context).size.width,
+              child: ListView.builder(
+                shrinkWrap: true,
+                scrollDirection: Axis.horizontal,
+                itemCount: tagName.length,
+                itemBuilder: (context, index) {
+                  return Row(
+                    children: [
+                      Wrap(
+                        alignment: WrapAlignment.spaceBetween,
+                        direction: Axis.horizontal,
+                        runSpacing: 10,
+                        children: <Widget>[
+                          GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => TagScreen(
+                                            '${tagName[index]}',
+                                          )));
+                            },
+                            child: Container(
+                              margin: const EdgeInsets.fromLTRB(0, 0, 10, 0),
+                              child: Text(tagName[index]),
+                              decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  border:
+                                      Border.all(color: Colors.grey.shade300),
+                                  borderRadius: BorderRadius.circular(30)),
+                              padding: EdgeInsets.fromLTRB(12, 12, 12, 12),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  );
+                },
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
   late TabController _tabController;
 
   @override
-  void initState() {
-    super.initState();
-    _tabController = new TabController(length: 2, vsync: this);
-    super.initState();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        iconTheme: IconThemeData(color: constantColors.greenColor),
-        backgroundColor: constantColors.whiteColor,
+        iconTheme: IconThemeData(color: constantColors.whiteColor),
+        backgroundColor: constantColors.greenColor,
         title: Text(
           'conduit',
           style: TextStyle(
-              color: constantColors.greenColor, fontWeight: FontWeight.bold),
+              color: constantColors.whiteColor, fontWeight: FontWeight.bold),
         ),
       ),
       drawer: Drawer(
@@ -437,36 +568,21 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       body: SingleChildScrollView(
           child: Column(
         children: [
-          //top container
-          Container(
-            child:
-                Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-              Text(
-                'conduit',
-                style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 40,
-                    color: constantColors.whiteColor),
-              ),
-              Text(
-                'A place to share your knowledge.',
-                style: TextStyle(
-                    fontWeight: FontWeight.w300,
-                    fontSize: 20,
-                    color: constantColors.whiteColor),
-              ),
-            ]),
-            height: MediaQuery.of(context).size.height * 0.3,
-            width: MediaQuery.of(context).size.width,
-            color: constantColors.greenColor,
-          ),
+          //top container //carouseal
 
-          SizedBox(
-            height: 20,
+          Container(
+            child: CarouselSlider(
+              options: CarouselOptions(
+                autoPlay: true,
+                aspectRatio: 2,
+                enlargeCenterPage: true,
+              ),
+              items: imageSliders,
+            ),
           ),
-          //middle
 
           TabBar(
+              // overlayColor: Colors.orange,
               labelColor: constantColors.greenColor,
               unselectedLabelColor: constantColors.greyColor,
               indicatorColor: Colors.green,
@@ -486,65 +602,13 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 ),
               ]),
           Container(
-            height: MediaQuery.of(context).size.height * 1.2,
+            height: MediaQuery.of(context).size.height * 1.5,
             width: MediaQuery.of(context).size.width,
             child: TabBarView(controller: _tabController, children: <Widget>[
               yourFeed(),
               customerListView(),
             ]),
           ),
-          // Container(
-          //   child: Row(
-          //     mainAxisAlignment: MainAxisAlignment.spaceAround,
-          //     children: [
-          //       GestureDetector(
-          //         onTap: () {
-          //           yourFeed();
-          //           setState(() {
-          //             selected = 'Your Feed';
-          //           });
-          //         },
-          //         child: Text(
-          //           'Your Feed',
-          //           style: TextStyle(
-          //               color: selected == 'Global Feed'
-          //                   ? constantColors.greyColor
-          //                   : constantColors.greenColor,
-          //               fontSize: 16),
-          //         ),
-          //       ),
-          //       GestureDetector(
-          //         onTap: () {
-          //           setState(() {
-          //             selected = 'Global Feed';
-          //           });
-          //         },
-          //         child: Text(
-          //           'Global Feed',
-          //           style: TextStyle(
-          //               color: selected == 'Global Feed'
-          //                   ? constantColors.greenColor
-          //                   : constantColors.greyColor,
-          //               fontSize: 16),
-          //         ),
-          //       ),
-          //     ],
-          //   ),
-          // ),
-          // SizedBox(
-          //   height: 10,
-          // ),
-          // Padding(
-          //   padding: EdgeInsets.symmetric(horizontal: 20),
-          //   child: Divider(
-          //     color: constantColors.darkColor,
-          //     height: 1,
-          //   ),
-          // ),
-
-          // Container(
-          //   child: selected == 'Your Feed' ? yourFeed() : listView(),
-          // ),
         ],
       )),
       bottomNavigationBar: BottomAppBarPage(),

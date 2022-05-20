@@ -1,13 +1,18 @@
 import 'package:first_app/Screens/Drawer/home.dart';
-import 'package:first_app/Screens/SplashScreen.dart';
+import 'package:first_app/Screens/Registration/splash%20_screen.dart';
 import 'package:first_app/Screens/Registration/sign_in.dart';
 import 'package:first_app/constants/Constantcolors.dart';
+import 'package:first_app/model/user_model.dart';
+import 'package:first_app/provider/auth_provider.dart';
+import 'package:first_app/provider/user_provider.dart';
+import 'package:first_app/utils/shared_prefences.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
 
 void main() {
   SystemChrome.setSystemUIOverlayStyle(
-      SystemUiOverlayStyle(statusBarColor: Colors.transparent));
+      SystemUiOverlayStyle(statusBarColor: Color(0xff26872f)));
   runApp(const MyApp());
 }
 
@@ -18,15 +23,24 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     ConstantColors constantColors = ConstantColors();
-    return MaterialApp(
-        debugShowCheckedModeBanner: false,
-        theme: ThemeData(
-          appBarTheme: AppBarTheme(
-            systemOverlayStyle: SystemUiOverlayStyle.dark,
+    Future<User?> getUserData() => UserPreferences().getUser();
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => AuthProvider()),
+        ChangeNotifierProvider(create: (_) => UserProvider())
+      ],
+      child: MaterialApp(
+          debugShowCheckedModeBanner: false,
+          theme: ThemeData(
+            appBarTheme: AppBarTheme(
+              // color: Color(0xff26872f),
+              // backgroundColor: Color(0xff26872f)
+              systemOverlayStyle: SystemUiOverlayStyle.light,
+            ),
+            // primaryColor: constantColors.whiteColor,
+            fontFamily: 'TitilliumWeb',
           ),
-          // primaryColor: constantColors.whiteColor,
-          fontFamily: 'TitilliumWeb',
-        ),
-        home: SplashScreen());
+          home: SplashScreen()),
+    );
   }
 }

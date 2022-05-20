@@ -1,13 +1,32 @@
-// class Album {
-//   final String name;
-//   final String email;
+class User {
+  int userId;
+  String name;
+  String email;
+  // Strng phone;
+  String type;
+  String token;
+  String renewalToken;
 
-//   const Album({required this.name, required this.email});
+  User(
+      {required this.userId,
+      required this.name,
+      required this.email,
+      // required this.phone,
+      required this.type,
+      required this.token,
+      required this.renewalToken});
 
-//   factory Album.fromJson(Map<String, dynamic> json) {
-//     return Album(
-//       name: json['name'],
-//       email: json['email'],
-//     );
-//   }
-// }
+  // now create converter
+
+  factory User.fromJson(Map<String, dynamic> responseData) {
+    return User(
+      userId: responseData['id'],
+      name: responseData['Username'],
+      email: responseData['Email'],
+      // phone: responseData['phone'],
+      type: responseData['type'],
+      token: responseData['token'],
+      renewalToken: responseData['token'],
+    );
+  }
+}

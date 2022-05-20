@@ -1,16 +1,35 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:first_app/Widget/buttomAppBar.dart';
 import 'package:first_app/constants/Constantcolors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/framework.dart';
 
 class ReadMorePage extends StatefulWidget {
-  const ReadMorePage({super.key});
+  final String title;
+  final String author;
+  final String desc;
+  final DateTime date;
+  final String imageUrl;
+
+  // const TagScreen(String s, {super.key});
+  ReadMorePage(this.title, this.author, this.desc, this.date, this.imageUrl);
 
   @override
-  State<ReadMorePage> createState() => _ReadMorePageState();
+  State<ReadMorePage> createState() => _ReadMorePageState(
+      this.title, this.author, this.desc, this.date, this.imageUrl);
 }
 
 class _ReadMorePageState extends State<ReadMorePage> {
+  bool? follow = false;
+
+  final String title;
+  final String author;
+  final String desc;
+  final DateTime date;
+  final String imageUrl;
+  // const TagScreen(String s, {super.key});
+  _ReadMorePageState(
+      this.title, this.author, this.desc, this.date, this.imageUrl);
   ConstantColors constantColors = ConstantColors();
   @override
   Widget build(BuildContext context) {
@@ -44,59 +63,90 @@ class _ReadMorePageState extends State<ReadMorePage> {
                 Padding(
                   padding: const EdgeInsets.only(left: 20.0),
                   child: Text(
-                    'Create a new implementation',
+                    title,
                     style: TextStyle(
                         color: constantColors.whiteColor,
                         fontWeight: FontWeight.bold,
-                        fontSize: MediaQuery.of(context).size.height * 0.03),
+                        fontSize: MediaQuery.of(context).size.height * 0.025),
                   ),
                 ),
+                SizedBox(
+                  height: 40,
+                ),
                 ListTile(
-                  leading: CircleAvatar(
-                    backgroundImage:
-                        AssetImage('assets/images/demo-avatar.png'),
+                  leading: CachedNetworkImage(
+                    width: 50,
+                    height: 50,
+                    imageBuilder: (context, imageProvider) => Container(
+                      width: 80.0,
+                      height: 80.0,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        image: DecorationImage(
+                            image: imageProvider, fit: BoxFit.cover),
+                      ),
+                    ),
+                    progressIndicatorBuilder: (context, url, progress) =>
+                        Center(
+                      child: CircularProgressIndicator(
+                        strokeWidth: 5,
+                        color: constantColors.greenColor,
+                        value: progress.progress,
+                      ),
+                    ),
+                    imageUrl: imageUrl,
                   ),
                   title: Text(
-                    'Gerome',
+                    author,
                     style: TextStyle(color: constantColors.whiteColor),
                   ),
                   subtitle: Text(
-                    'November 24,2001',
+                    '${date.month}/${date.day}/${date.year}',
                     style: TextStyle(
                         color: constantColors.greyColor,
                         fontSize: MediaQuery.of(context).size.height * 0.017),
                   ),
                 ),
                 Padding(
-                  padding: const EdgeInsets.only(left: 20.0),
-                  child: Container(
-                    alignment: Alignment.center,
-                    width: 150,
-                    height: MediaQuery.of(context).size.height * 0.065,
-                    decoration: BoxDecoration(
-                      border: Border.all(color: Colors.white38),
-                      borderRadius: BorderRadius.circular(5),
-                    ),
-                    child: GestureDetector(
-                        onTap: () {},
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 20, vertical: 0),
+                  child: GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          follow = !follow!;
+                        });
+                      },
+                      child: Container(
+                        width: 170,
+                        height: 40,
+                        decoration: BoxDecoration(
+                            border: Border.all(color: Colors.grey.shade500),
+                            borderRadius: BorderRadius.circular(5)),
                         child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.center,
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Icon(
-                              Icons.add,
-                              color: Colors.white38,
+                              follow == true ? null : Icons.add,
+                              color: Colors.grey.shade500,
                             ),
                             SizedBox(
-                              width: 3,
+                              width: (follow == true ? 0 : 10),
                             ),
-                            Text(
-                              "Follow Gerome",
-                              style: TextStyle(color: Colors.white38),
+                            Row(
+                              children: [
+                                Text(
+                                  follow == true ? "Unfollow" : "Follow",
+                                  style: TextStyle(color: Colors.grey.shade500),
+                                ),
+                                Text(
+                                  ' $author',
+                                  style: TextStyle(color: Colors.grey.shade500),
+                                ),
+                              ],
                             ),
                           ],
-                        )),
-                  ),
+                        ),
+                      )),
                 ),
               ],
             ),
@@ -106,7 +156,7 @@ class _ReadMorePageState extends State<ReadMorePage> {
                 top: 20.0, right: 20, left: 20, bottom: 20),
             child: Container(
               child: Text(
-                'Share your knowledge and enpower the community by creating a new implementation',
+                desc,
                 style: TextStyle(fontSize: 16),
               ),
             ),
