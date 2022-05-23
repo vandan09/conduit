@@ -52,7 +52,12 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   String selectDrawer = 'home';
 
   final check = List.generate(10, (index) => index * 2);
-  final tagName = ['welcome', 'implementation', 'introduction', 'codeBaseShow'];
+  final tagName = [
+    'welcome',
+    'implementations',
+    'introduction',
+    'codebaseShow'
+  ];
 
   final List<Widget> imageSliders = imgList
       .map((item) => Container(
@@ -88,21 +93,21 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           ))
       .toList();
 
-  int? selectedIndex;
-  _setIndex(int index) {
+  // int? selectedIndex;
+  _setIndex(bool index) {
     setState(() {
-      check[index] = 1;
+      index = false;
     });
   }
 
-  _unSet(int index) {
+  _unSet(bool index) {
     setState(() {
-      check[index] = 0;
+      index = false;
     });
   }
 
-  bool _checkColor(int index) {
-    if (check[index] == 1) {
+  bool _checkColor(bool index) {
+    if (index == true) {
       return true;
     } else {
       return false;
@@ -135,9 +140,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                     itemCount: snapshot.data!.articles.length,
                     itemBuilder: ((context, index) {
                       var article = snapshot.data!.articles[index];
-                      String authorName = article.author;
-                      String result =
-                          authorName.substring(0, authorName.indexOf(' '));
+                      String authorName = article.author.username;
+                      List tag = article.tagList;
                       return Padding(
                         padding: const EdgeInsets.only(
                             top: 15.0, left: 15, right: 15),
@@ -151,17 +155,17 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                 trailing: GestureDetector(
                                   onTap: () {
                                     setState(() {
-                                      _setIndex(index);
+                                      article.favorited = true;
                                     });
                                   },
                                   onLongPress: () {
                                     setState(() {
-                                      _unSet(index);
+                                      article.favorited = false;
                                     });
                                   },
                                   child: Container(
                                     decoration: BoxDecoration(
-                                        color: _checkColor(index)
+                                        color: article.favorited == true
                                             ? constantColors.greenColor
                                             : constantColors.whiteColor,
                                         // _checkColor(index);
@@ -179,7 +183,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                       children: [
                                         Icon(
                                           Icons.favorite,
-                                          color: _checkColor(index)
+                                          color: article.favorited == true
                                               ? constantColors.whiteColor
                                               : constantColors.greenColor,
                                           size: 20,
@@ -188,9 +192,9 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                           width: 2,
                                         ),
                                         Text(
-                                          '20',
+                                          '${article.favoritesCount}',
                                           style: TextStyle(
-                                              color: _checkColor(index)
+                                              color: article.favorited == true
                                                   ? constantColors.whiteColor
                                                   : constantColors.greenColor,
                                               fontSize: 16),
@@ -199,18 +203,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                     ),
                                   ),
                                 ),
-                                // author image
-                                // leading: Container(decoration: BoxDecoration(image: Cach()),),
-                                // leading: CachedNetworkImage(
-                                //   imageUrl: article.urlToImage,
-                                //   placeholder:
-                                //       (BuildContext context, String url) =>
-                                //           Container(
-                                //     width: 20,
-                                //     height: 20,
-                                //     color: Colors.purple,
-                                //   ),
-                                // ),
+                                //author image
                                 leading: CachedNetworkImage(
                                   width: 50,
                                   height: 50,
@@ -233,7 +226,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                       value: progress.progress,
                                     ),
                                   ),
-                                  imageUrl: article.urlToImage,
+                                  imageUrl: article.author.image,
                                 ),
 
                                 //author name
@@ -244,19 +237,19 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                       context,
                                       MaterialPageRoute(
                                           builder: (context) =>
-                                              ClientProfilePapge(
-                                                  result, article.urlToImage)),
+                                              ClientProfilePapge(authorName,
+                                                  article.author.image)),
                                     );
                                   },
                                   child: Text(
-                                    result,
+                                    authorName,
                                     style: TextStyle(
                                         color: constantColors.greenColor),
                                   ),
                                 ),
                                 //date
                                 subtitle: Text(
-                                  '${article.publishedAt.month}/${article.publishedAt.day}/${article.publishedAt.year}',
+                                  '${article.createdAt.month}/${article.createdAt.day}/${article.createdAt.year}',
                                   style: TextStyle(
                                       color: constantColors.greyColor,
                                       fontSize: 12),
@@ -277,10 +270,11 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                                   builder: (context) =>
                                                       ReadMorePage(
                                                           article.title,
-                                                          result,
+                                                          authorName,
                                                           article.description,
-                                                          article.publishedAt,
-                                                          article.urlToImage)));
+                                                          article.createdAt,
+                                                          article
+                                                              .author.image)));
                                         },
                                         child: Text(
                                           article.title,
@@ -303,42 +297,67 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                           color: constantColors.greyColor,
                                           fontSize: 14),
                                     )),
-                                    // //read more link
-                                    // GestureDetector(
-                                    //     onTap: () {
-                                    //       Navigator.push(
-                                    //           context,
-                                    //           MaterialPageRoute(
-                                    //               builder: (context) =>
-                                    //                   ReadMorePage()));
-                                    //     },
-                                    //     child: Text(
-                                    //       'Read more...',
-                                    //       style: TextStyle(
-                                    //           color: Colors.grey.shade400,
-                                    //           fontSize: 13),
-                                    //     )),
+
                                     SizedBox(
                                       height: 10,
                                     ),
                                     //articles tags
-                                    GestureDetector(
-                                        onTap: () {},
-                                        child: Container(
-                                          padding: EdgeInsets.all(3),
-                                          decoration: BoxDecoration(
-                                              border: Border.all(
-                                                color: Colors.grey.shade400,
-                                              ),
-                                              borderRadius:
-                                                  BorderRadius.circular(30)),
-                                          child: Text(
-                                            'implementations',
-                                            style: TextStyle(
-                                                color: Colors.grey.shade400,
-                                                fontSize: 13),
-                                          ),
-                                        )),
+
+                                    Container(
+                                      height: 40,
+                                      width: MediaQuery.of(context).size.width,
+                                      padding: EdgeInsets.all(3),
+                                      child: ListView.builder(
+                                        scrollDirection: Axis.horizontal,
+                                        physics: NeverScrollableScrollPhysics(),
+                                        shrinkWrap: true,
+                                        itemCount: tag.length,
+                                        itemBuilder: ((context, index) {
+                                          return Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.start,
+                                            children: [
+                                              GestureDetector(
+                                                onTap: () {
+                                                  Navigator.push(
+                                                      context,
+                                                      MaterialPageRoute(
+                                                          builder: (context) =>
+                                                              TagScreen(
+                                                                '${tag[index]}',
+                                                              )));
+                                                },
+                                                child: Padding(
+                                                  padding:
+                                                      const EdgeInsets.only(
+                                                          right: 8.0),
+                                                  child: Container(
+                                                      width: 130,
+                                                      height: 30,
+                                                      decoration: BoxDecoration(
+                                                          border: Border.all(
+                                                            color: Colors
+                                                                .grey.shade400,
+                                                          ),
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(
+                                                                      30)),
+                                                      child: Center(
+                                                          child: Text(
+                                                        tag[index],
+                                                        style: TextStyle(
+                                                            color: Colors
+                                                                .grey.shade400,
+                                                            fontSize: 13),
+                                                      ))),
+                                                ),
+                                              )
+                                            ],
+                                          );
+                                        }),
+                                      ),
+                                    ),
                                     SizedBox(
                                       height: 10,
                                     ),
@@ -352,9 +371,12 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                       );
                     }));
               } else {
-                return Center(
-                    child: CircularProgressIndicator(
-                        color: constantColors.greenColor));
+                return Padding(
+                  padding: const EdgeInsets.all(20.0),
+                  child: Center(
+                      child: CircularProgressIndicator(
+                          color: constantColors.greenColor)),
+                );
               }
             },
           ),

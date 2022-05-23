@@ -1,14 +1,19 @@
+import 'dart:convert';
+
 import 'package:another_flushbar/flushbar.dart';
 import 'package:first_app/Widget/customRaisedButton.dart';
 import 'package:first_app/Screens/Registration/sign_in.dart';
 import 'package:first_app/constants/Constantcolors.dart';
+import 'package:first_app/constants/constant_strings.dart';
+import 'package:first_app/model/user_model.dart';
+
 import 'package:first_app/provider/auth_provider.dart';
 import 'package:first_app/utils/validation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
-import 'package:flutter/src/widgets/framework.dart';
-import 'package:fluttertoast/fluttertoast.dart';
-import 'package:provider/provider.dart';
+import 'package:http/http.dart' as http;
+
+import '../../services/api.dart';
 
 class SignupPage extends StatefulWidget {
   const SignupPage({super.key});
@@ -18,45 +23,61 @@ class SignupPage extends StatefulWidget {
 }
 
 class _SignupPageState extends State<SignupPage> {
+  RegisterWelcome? _welcome;
+  Future<RegisterWelcome>? _registerModel;
+
+  void initState() {
+    super.initState();
+  }
+
   Duration get loginTime => Duration(milliseconds: timeDilation.ceil() * 2250);
   ConstantColors constantColors = ConstantColors();
+  TextEditingController usernameController = TextEditingController();
+  TextEditingController emailController = TextEditingController();
+  TextEditingController passwordController = TextEditingController();
 
   final GlobalKey<FormState> _formkey = GlobalKey<FormState>();
 
-  String? _userName, _userEmail, _password;
+  // String? _userName, _userEmail, _password;
+  void doRegister(String name, String email, String password) async {
+    if (_formkey.currentState!.validate()) {
+      _formkey.currentState!.save();
+      print('valid');
+      var userBody = <String, dynamic>{
+        "email": email,
+        "password": password,
+        "username": name,
+      };
+
+      try {
+        var response = await http.post(Uri.parse(Strings.register_url),
+            body: json.encode(userBody),
+            headers: <String, String>{
+              "Accept": "application/json",
+              "content-type": "application/json"
+            });
+        if (response.statusCode == 200) {
+          RegisterWelcome.fromJson(jsonDecode(response.body));
+          // print('Account Created successfully');
+        } else {
+          throw Exception('Failed to create model. ${response.body}');
+        }
+      } catch (e) {
+        print(e);
+      }
+    } else {
+      Flushbar(
+        title: 'Invalid form',
+        message: 'Please complete the form properly',
+        duration: Duration(seconds: 2),
+      ).show(context);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    AuthProvider auth = Provider.of<AuthProvider>(context);
-    // ignore: prefer_function_declaratio
-    //
-    // ns_over_variables
-    void doRegister() {
-      // final FormState form = formKey.currentContext as FormState;
-
-      if (_formkey.currentState!.validate()) {
-        _formkey.currentState!.save();
-        auth.loggedInStatus = Status.Authenticating;
-        auth.notify();
-
-        Future.delayed(loginTime).then((_) {
-          Navigator.push(
-              context, MaterialPageRoute(builder: (context) => LogInPage()));
-          auth.loggedInStatus = Status.LoggedIn;
-          auth.notify();
-          print("Created");
-        });
-      } else {
-        Flushbar(
-          title: 'Invalid form',
-          message: 'Please complete the form properly',
-          duration: Duration(seconds: 2),
-        ).show(context);
-      }
-    }
-
     return GestureDetector(
-      onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
+      // onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
       child: Scaffold(
           body: Container(
         width: MediaQuery.of(context).size.width,
@@ -88,11 +109,12 @@ class _SignupPageState extends State<SignupPage> {
                         Container(
                             margin: EdgeInsets.fromLTRB(30, 80, 30, 0),
                             child: TextFormField(
-                              onSaved: (value) => _userName = value,
+                              // onSaved: (value) => _userName = value,
                               validator: (value) =>
                                   value!.isEmpty ? "Enter User name" : null,
                               keyboardType: TextInputType.text,
                               textInputAction: TextInputAction.next,
+                              controller: usernameController,
                               decoration: InputDecoration(
                                   border: OutlineInputBorder(),
                                   hintText: 'Username'),
@@ -101,10 +123,11 @@ class _SignupPageState extends State<SignupPage> {
                         Container(
                             margin: EdgeInsets.fromLTRB(30, 30, 30, 0),
                             child: TextFormField(
-                              onSaved: (value) => _userEmail = value,
+                              // onSaved: (value) => _userEmail = value,
                               validator: validateEmail,
                               keyboardType: TextInputType.emailAddress,
                               textInputAction: TextInputAction.next,
+                              controller: emailController,
                               decoration: InputDecoration(
                                   border: OutlineInputBorder(),
                                   hintText: 'Email'),
@@ -113,11 +136,12 @@ class _SignupPageState extends State<SignupPage> {
                         Container(
                             margin: EdgeInsets.fromLTRB(30, 30, 30, 0),
                             child: TextFormField(
-                              onSaved: (value) => _password = value,
+                              // onSaved: (value) => _password = value,
                               validator: (value) =>
                                   value!.isEmpty ? "Enter Password" : null,
                               obscureText: true,
                               keyboardType: TextInputType.visiblePassword,
+                              controller: passwordController,
                               decoration: InputDecoration(
                                   border: OutlineInputBorder(),
                                   hintText: 'Password'),
@@ -127,9 +151,13 @@ class _SignupPageState extends State<SignupPage> {
                           padding: const EdgeInsets.all(40),
                           child: GestureDetector(
                               onTap: () {
-                                auth.loggedInStatus == Status.Authenticating
-                                    ? CircularProgressIndicator()
-                                    : doRegister();
+                                // auth.loggedInStatus == Status.Authenticating
+                                // ? CircularProgressIndicator()
+
+                                doRegister(
+                                    usernameController.text,
+                                    emailController.text,
+                                    passwordController.text);
                               },
                               child: CustomRaisedButton(
                                 buttonText: 'Sign up',

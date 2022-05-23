@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:first_app/Screens/others/readmore_page.dart';
+import 'package:first_app/Screens/others/tag_screen.dart';
 import 'package:first_app/Widget/buttomAppBar.dart';
 import 'package:first_app/constants/Constantcolors.dart';
 import 'package:first_app/model/article_model.dart';
@@ -87,10 +88,10 @@ class _ClientProfilePapgeState extends State<ClientProfilePapge>
                 itemCount: snapshot.data!.articles.length,
                 itemBuilder: ((context, index) {
                   var article = snapshot.data!.articles[index];
-                  String authorName = article.author;
-                  String result =
-                      authorName.substring(0, authorName.indexOf(' '));
-                  if (result == author) {
+                  String authorName = article.author.username;
+                  List tag = article.tagList;
+
+                  if (authorName == author) {
                     return Padding(
                       padding:
                           const EdgeInsets.only(top: 15.0, left: 15, right: 15),
@@ -103,17 +104,17 @@ class _ClientProfilePapgeState extends State<ClientProfilePapge>
                               trailing: GestureDetector(
                                 onTap: () {
                                   setState(() {
-                                    _setIndex(index);
+                                    article.favorited = true;
                                   });
                                 },
                                 onLongPress: () {
                                   setState(() {
-                                    _unSet(index);
+                                    article.favorited = false;
                                   });
                                 },
                                 child: Container(
                                   decoration: BoxDecoration(
-                                      color: _checkColor(index)
+                                      color: article.favorited == true
                                           ? constantColors.greenColor
                                           : constantColors.whiteColor,
                                       // _checkColor(index);
@@ -130,7 +131,7 @@ class _ClientProfilePapgeState extends State<ClientProfilePapge>
                                     children: [
                                       Icon(
                                         Icons.favorite,
-                                        color: _checkColor(index)
+                                        color: article.favorited == true
                                             ? constantColors.whiteColor
                                             : constantColors.greenColor,
                                         size: 20,
@@ -139,9 +140,9 @@ class _ClientProfilePapgeState extends State<ClientProfilePapge>
                                         width: 2,
                                       ),
                                       Text(
-                                        '20',
+                                        '${article.favoritesCount}',
                                         style: TextStyle(
-                                            color: _checkColor(index)
+                                            color: article.favorited == true
                                                 ? constantColors.whiteColor
                                                 : constantColors.greenColor,
                                             fontSize: 16),
@@ -173,7 +174,7 @@ class _ClientProfilePapgeState extends State<ClientProfilePapge>
                                     value: progress.progress,
                                   ),
                                 ),
-                                imageUrl: article.urlToImage,
+                                imageUrl: article.author.image,
                               ),
                               //author name
 
@@ -183,19 +184,19 @@ class _ClientProfilePapgeState extends State<ClientProfilePapge>
                                     context,
                                     MaterialPageRoute(
                                         builder: (context) =>
-                                            ClientProfilePapge(
-                                                result, article.urlToImage)),
+                                            ClientProfilePapge(authorName,
+                                                article.author.image)),
                                   );
                                 },
                                 child: Text(
-                                  result,
+                                  authorName,
                                   style: TextStyle(
                                       color: constantColors.greenColor),
                                 ),
                               ),
                               //date
                               subtitle: Text(
-                                '${article.publishedAt.month}/${article.publishedAt.day}/${article.publishedAt.year}',
+                                '${article.createdAt.month}/${article.createdAt.day}/${article.createdAt.year}',
                                 style: TextStyle(
                                     color: constantColors.greyColor,
                                     fontSize: 12),
@@ -216,10 +217,10 @@ class _ClientProfilePapgeState extends State<ClientProfilePapge>
                                                 builder: (context) =>
                                                     ReadMorePage(
                                                         article.title,
-                                                        result,
+                                                        authorName,
                                                         article.description,
-                                                        article.publishedAt,
-                                                        article.urlToImage)));
+                                                        article.createdAt,
+                                                        article.author.image)));
                                       },
                                       child: Text(
                                         article.title,
@@ -247,23 +248,59 @@ class _ClientProfilePapgeState extends State<ClientProfilePapge>
                                     height: 10,
                                   ),
                                   //articles tags
-                                  GestureDetector(
-                                      onTap: () {},
-                                      child: Container(
-                                        padding: EdgeInsets.all(3),
-                                        decoration: BoxDecoration(
-                                            border: Border.all(
-                                              color: Colors.grey.shade400,
-                                            ),
-                                            borderRadius:
-                                                BorderRadius.circular(30)),
-                                        child: Text(
-                                          'implementations',
-                                          style: TextStyle(
-                                              color: Colors.grey.shade400,
-                                              fontSize: 13),
-                                        ),
-                                      )),
+                                  Container(
+                                    height: 40,
+                                    width: MediaQuery.of(context).size.width,
+                                    padding: EdgeInsets.all(3),
+                                    child: ListView.builder(
+                                      scrollDirection: Axis.horizontal,
+                                      physics: NeverScrollableScrollPhysics(),
+                                      shrinkWrap: true,
+                                      itemCount: tag.length,
+                                      itemBuilder: ((context, index) {
+                                        return Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.start,
+                                          children: [
+                                            GestureDetector(
+                                              onTap: () {
+                                                Navigator.push(
+                                                    context,
+                                                    MaterialPageRoute(
+                                                        builder: (context) =>
+                                                            TagScreen(
+                                                              '${tag[index]}',
+                                                            )));
+                                              },
+                                              child: Padding(
+                                                padding: const EdgeInsets.only(
+                                                    right: 8.0),
+                                                child: Container(
+                                                    width: 130,
+                                                    height: 30,
+                                                    decoration: BoxDecoration(
+                                                        border: Border.all(
+                                                          color: Colors
+                                                              .grey.shade400,
+                                                        ),
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(30)),
+                                                    child: Center(
+                                                        child: Text(
+                                                      tag[index],
+                                                      style: TextStyle(
+                                                          color: Colors
+                                                              .grey.shade400,
+                                                          fontSize: 13),
+                                                    ))),
+                                              ),
+                                            )
+                                          ],
+                                        );
+                                      }),
+                                    ),
+                                  ),
                                   SizedBox(
                                     height: 10,
                                   ),
@@ -283,9 +320,12 @@ class _ClientProfilePapgeState extends State<ClientProfilePapge>
                   }
                 }));
           } else {
-            return Center(
-                child: CircularProgressIndicator(
-                    color: constantColors.greenColor));
+            return Padding(
+              padding: const EdgeInsets.all(20.0),
+              child: Center(
+                  child: CircularProgressIndicator(
+                      color: constantColors.greenColor)),
+            );
           }
         },
       ),

@@ -23,24 +23,18 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     ConstantColors constantColors = ConstantColors();
-    Future<User?> getUserData() => UserPreferences().getUser();
-    return MultiProvider(
-      providers: [
-        ChangeNotifierProvider(create: (_) => AuthProvider()),
-        ChangeNotifierProvider(create: (_) => UserProvider())
-      ],
-      child: MaterialApp(
-          debugShowCheckedModeBanner: false,
-          theme: ThemeData(
-            appBarTheme: AppBarTheme(
-              // color: Color(0xff26872f),
-              // backgroundColor: Color(0xff26872f)
-              systemOverlayStyle: SystemUiOverlayStyle.light,
-            ),
-            // primaryColor: constantColors.whiteColor,
-            fontFamily: 'TitilliumWeb',
+    // Future<User?> getUserData() => UserPreferences().getUser();
+    return MaterialApp(
+        debugShowCheckedModeBanner: false,
+        theme: ThemeData(
+          appBarTheme: AppBarTheme(
+            // color: Color(0xff26872f),
+            // backgroundColor: Color(0xff26872f)
+            systemOverlayStyle: SystemUiOverlayStyle.light,
           ),
-          home: SplashScreen()),
-    );
+          // primaryColor: constantColors.whiteColor,
+          fontFamily: 'TitilliumWeb',
+        ),
+        home: SplashScreen());
   }
 }

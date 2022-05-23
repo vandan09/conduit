@@ -1,32 +1,59 @@
+// To parse this JSON data, do
+//
+//     final RegisterWelcome = welcomeFromJson(jsonString);
+
+import 'dart:convert';
+
+RegisterWelcome welcomeFromJson(String str) =>
+    RegisterWelcome.fromJson(json.decode(str));
+
+String welcomeToJson(RegisterWelcome data) => json.encode(data.toJson());
+
+class RegisterWelcome {
+  RegisterWelcome({
+    required this.user,
+  });
+
+  User user;
+
+  factory RegisterWelcome.fromJson(Map<String, dynamic> json) =>
+      RegisterWelcome(
+        user: User.fromJson(json["user"]),
+      );
+
+  Map<String, dynamic> toJson() => {
+        "user": user.toJson(),
+      };
+}
+
 class User {
-  int userId;
-  String name;
+  User({
+    required this.email,
+    required this.username,
+    this.bio,
+    this.image,
+    required this.token,
+  });
+
   String email;
-  // Strng phone;
-  String type;
+  String username;
+  dynamic bio;
+  dynamic image;
   String token;
-  String renewalToken;
 
-  User(
-      {required this.userId,
-      required this.name,
-      required this.email,
-      // required this.phone,
-      required this.type,
-      required this.token,
-      required this.renewalToken});
+  factory User.fromJson(Map<String, dynamic> json) => User(
+        email: json["email"],
+        username: json["username"],
+        bio: json["bio"],
+        image: json["image"],
+        token: json["token"],
+      );
 
-  // now create converter
-
-  factory User.fromJson(Map<String, dynamic> responseData) {
-    return User(
-      userId: responseData['id'],
-      name: responseData['Username'],
-      email: responseData['Email'],
-      // phone: responseData['phone'],
-      type: responseData['type'],
-      token: responseData['token'],
-      renewalToken: responseData['token'],
-    );
-  }
+  Map<String, dynamic> toJson() => {
+        "email": email,
+        "username": username,
+        "bio": bio,
+        "image": image,
+        "token": token,
+      };
 }

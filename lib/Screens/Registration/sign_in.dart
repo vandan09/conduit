@@ -1,8 +1,11 @@
+import 'dart:convert';
+
 import 'package:another_flushbar/flushbar.dart';
 import 'package:first_app/Screens/Drawer/home.dart';
 import 'package:first_app/Screens/Registration/signup_page.dart';
 import 'package:first_app/Widget/customRaisedButton.dart';
 import 'package:first_app/constants/Constantcolors.dart';
+import 'package:first_app/constants/constant_strings.dart';
 import 'package:first_app/model/user_model.dart';
 import 'package:first_app/provider/auth_provider.dart';
 import 'package:first_app/provider/user_provider.dart';
@@ -11,6 +14,7 @@ import 'package:first_app/utils/validation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:http/http.dart' as http;
+import 'package:http/http.dart';
 import 'package:provider/provider.dart';
 
 class LogInPage extends StatefulWidget {
@@ -23,57 +27,42 @@ class LogInPage extends StatefulWidget {
 class _LogInPageState extends State<LogInPage> {
   ConstantColors constantColors = ConstantColors();
   final GlobalKey<FormState> _formkey = GlobalKey<FormState>();
-  final TextEditingController _controller = TextEditingController();
+  TextEditingController passwordController = TextEditingController();
+  TextEditingController emailController = TextEditingController();
   // Future<Album>? _futureAlbum;
   String? _userEmail, _password;
+  void doLoggedin(String email, password) async {
+    if (_formkey.currentState!.validate()) {
+      _formkey.currentState!.save();
+      var userBody = <String, dynamic>{
+        "email": email,
+        "password": password,
+      };
+
+      try {
+        Response response = await http.post(
+          Uri.parse(Strings.login_url),
+          body: json.encode(userBody),
+        );
+        if (response.statusCode == 200) {
+          print('login successfully');
+        } else {
+          print("Failed ${response.statusCode}");
+        }
+      } catch (e) {
+        print(e);
+      }
+    } else {
+      Flushbar(
+        title: 'Invalid form',
+        message: 'Please complete the form properly',
+        duration: Duration(seconds: 10),
+      ).show(context);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    AuthProvider auth = Provider.of<AuthProvider>(context);
-
-    void doLoggedin() {
-      // final form = _formKey.currentState;
-
-      if (_formkey.currentState!.validate()) {
-        _formkey.currentState!.save();
-        Navigator.pushReplacement(
-            context, MaterialPageRoute(builder: (context) => HomeScreen()));
-        print('Entered');
-        // final Future<Map<String, dynamic>> respose =
-        //     auth.login(_userEmail!, _password!);
-        // print('added');
-        // respose.then((response) {
-        //   if (response['status']) {
-        //     User user = response['user'];
-        //     print('here');
-
-        //     Provider.of<UserProvider>(context, listen: false).setUser(user);
-        //     print('SetUser');
-
-        //     Navigator.pushReplacement(
-        //         context, MaterialPageRoute(builder: (context) => HomeScreen()));
-        //     print('Entered');
-        //   }
-
-        //   else {
-        //     print('Error');
-
-        //     Flushbar(
-        //       title: "Failed Login",
-        //       message: response['message']['message'].toString(),
-        //       duration: Duration(seconds: 2),
-        //     ).show(context);
-        //   }
-        // });
-      } else {
-        Flushbar(
-          title: 'Invalid form',
-          message: 'Please complete the form properly',
-          duration: Duration(seconds: 10),
-        ).show(context);
-      }
-    }
-
     return GestureDetector(
       // onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
       child: Scaffold(
@@ -113,7 +102,7 @@ class _LogInPageState extends State<LogInPage> {
                             validator: validateEmail,
                             keyboardType: TextInputType.emailAddress,
                             textInputAction: TextInputAction.next,
-                            controller: _controller,
+                            controller: emailController,
                             decoration: InputDecoration(
                                 border: OutlineInputBorder(),
                                 hintText: 'Email'),
@@ -128,6 +117,7 @@ class _LogInPageState extends State<LogInPage> {
                                 value!.isEmpty ? "Please enter password" : null,
                             onSaved: (value) => _password = value,
                             obscureText: true,
+                            controller: passwordController,
                             keyboardType: TextInputType.visiblePassword,
                             decoration: InputDecoration(
                                 border: OutlineInputBorder(),
@@ -138,9 +128,8 @@ class _LogInPageState extends State<LogInPage> {
                         padding: const EdgeInsets.all(40),
                         child: GestureDetector(
                             onTap: () {
-                              auth.loggedInStatus == Status.Authenticating
-                                  ? CircularProgressIndicator()
-                                  : doLoggedin();
+                              doLoggedin(emailController.text,
+                                  passwordController.text);
                               // FocusScope.of(context).unfocus();
                             },
                             child: CustomRaisedButton(
