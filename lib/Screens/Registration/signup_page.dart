@@ -7,13 +7,13 @@ import 'package:first_app/constants/Constantcolors.dart';
 import 'package:first_app/constants/constant_strings.dart';
 import 'package:first_app/model/user_model.dart';
 
-import 'package:first_app/provider/auth_provider.dart';
+// import 'package:first_app/provider/auth_provider.dart';
 import 'package:first_app/utils/validation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:http/http.dart' as http;
 
-import '../../services/api.dart';
+// import '../../services/api.dart';
 
 class SignupPage extends StatefulWidget {
   const SignupPage({super.key});
@@ -23,7 +23,7 @@ class SignupPage extends StatefulWidget {
 }
 
 class _SignupPageState extends State<SignupPage> {
-  RegisterWelcome? _welcome;
+  // RegisterWelcome? _welcome;
   Future<RegisterWelcome>? _registerModel;
 
   void initState() {
@@ -39,25 +39,30 @@ class _SignupPageState extends State<SignupPage> {
   final GlobalKey<FormState> _formkey = GlobalKey<FormState>();
 
   // String? _userName, _userEmail, _password;
-  void doRegister(String name, String email, String password) async {
+  Future<RegisterWelcome> doRegister(
+      String name, String email, String password) async {
     if (_formkey.currentState!.validate()) {
       _formkey.currentState!.save();
       print('valid');
       var userBody = <String, dynamic>{
-        "email": email,
-        "password": password,
-        "username": name,
+        "user": {"email": email, "password": password, "username": name}
       };
 
       try {
-        var response = await http.post(Uri.parse(Strings.register_url),
+        http.Response response = await http.post(
+            Uri.parse(Strings.register_url),
             body: json.encode(userBody),
+            // encoding: Encoding.getByName("application/x-www-form-urlencoded"),
             headers: <String, String>{
               "Accept": "application/json",
               "content-type": "application/json"
             });
         if (response.statusCode == 200) {
-          RegisterWelcome.fromJson(jsonDecode(response.body));
+          print('Accont created');
+
+          return RegisterWelcome.fromJson(jsonDecode(response.body));
+          // Navigator.pushReplacement(
+          //     context, MaterialPageRoute(builder: ((context) => LogInPage())));
           // print('Account Created successfully');
         } else {
           throw Exception('Failed to create model. ${response.body}');
@@ -72,6 +77,7 @@ class _SignupPageState extends State<SignupPage> {
         duration: Duration(seconds: 2),
       ).show(context);
     }
+    throw 'error';
   }
 
   @override
@@ -154,7 +160,7 @@ class _SignupPageState extends State<SignupPage> {
                                 // auth.loggedInStatus == Status.Authenticating
                                 // ? CircularProgressIndicator()
 
-                                doRegister(
+                                _registerModel = doRegister(
                                     usernameController.text,
                                     emailController.text,
                                     passwordController.text);

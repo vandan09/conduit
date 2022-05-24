@@ -5,11 +5,7 @@ import 'package:first_app/Screens/Drawer/new_article.dart';
 import 'package:first_app/Screens/others/client_profile.dart';
 import 'package:first_app/Screens/others/readmore_page.dart';
 import 'package:first_app/Screens/others/tag_screen.dart';
-// import 'package:first_app/Screens/others/readmore_page.dart'le.dart';?
-// import 'package:first_app/Screens/others/readmore_page.dart';??
-// import 'package:first_app/Screens/others/others/client_profile.dart';
-// import 'package:first_app/Screens/client_profile.dart'';
-// import 'package:first_app/Screens/others/tag_screen.dart'n.dart';
+
 import 'package:first_app/Widget/buttomAppBar.dart';
 import 'package:first_app/Screens/Drawer/setting_page.dart';
 import 'package:first_app/constants/Constantcolors.dart';
@@ -458,7 +454,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     );
   }
 
-  late TabController _tabController;
+  TabController? _tabController;
 
   @override
   Widget build(BuildContext context) {
@@ -624,7 +620,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 ),
               ]),
           Container(
-            height: MediaQuery.of(context).size.height * 1.5,
+            height: MediaQuery.of(context).size.height * 1.2,
             width: MediaQuery.of(context).size.width,
             child: TabBarView(controller: _tabController, children: <Widget>[
               yourFeed(),

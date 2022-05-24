@@ -30,24 +30,32 @@ class _LogInPageState extends State<LogInPage> {
   TextEditingController passwordController = TextEditingController();
   TextEditingController emailController = TextEditingController();
   // Future<Album>? _futureAlbum;
+  Future<RegisterWelcome>? _registerModel;
+
   String? _userEmail, _password;
-  void doLoggedin(String email, password) async {
+  Future<RegisterWelcome> doLoggedin(String email, String password) async {
     if (_formkey.currentState!.validate()) {
       _formkey.currentState!.save();
+      print('valid');
       var userBody = <String, dynamic>{
-        "email": email,
-        "password": password,
+        "user": {"email": email, "password": password}
       };
 
       try {
-        Response response = await http.post(
-          Uri.parse(Strings.login_url),
-          body: json.encode(userBody),
-        );
+        http.Response response = await http.post(Uri.parse(Strings.login_url),
+            body: json.encode(userBody),
+            // encoding: Encoding.getByName("application/x-www-form-urlencoded"),
+            headers: <String, String>{
+              "Accept": "application/json",
+              "content-type": "application/json"
+            });
         if (response.statusCode == 200) {
-          print('login successfully');
+          Navigator.pushReplacement(
+              context, MaterialPageRoute(builder: ((context) => HomeScreen())));
+          // print('Account Created successfully');
+          return RegisterWelcome.fromJson(jsonDecode(response.body));
         } else {
-          print("Failed ${response.statusCode}");
+          throw Exception('Failed to create model. ${response.body}');
         }
       } catch (e) {
         print(e);
@@ -56,9 +64,10 @@ class _LogInPageState extends State<LogInPage> {
       Flushbar(
         title: 'Invalid form',
         message: 'Please complete the form properly',
-        duration: Duration(seconds: 10),
+        duration: Duration(seconds: 2),
       ).show(context);
     }
+    throw 'error';
   }
 
   @override
@@ -128,8 +137,12 @@ class _LogInPageState extends State<LogInPage> {
                         padding: const EdgeInsets.all(40),
                         child: GestureDetector(
                             onTap: () {
-                              doLoggedin(emailController.text,
-                                  passwordController.text);
+                              setState(() {
+                                _registerModel = doLoggedin(
+                                    emailController.text,
+                                    passwordController.text);
+                              });
+
                               // FocusScope.of(context).unfocus();
                             },
                             child: CustomRaisedButton(
