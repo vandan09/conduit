@@ -4,6 +4,7 @@ import 'package:first_app/Screens/Registration/sign_in.dart';
 import 'package:first_app/constants/Constantcolors.dart';
 import 'package:first_app/model/user_model.dart';
 import 'package:first_app/provider/auth_provider.dart';
+import 'package:first_app/provider/theme.dart';
 import 'package:first_app/provider/user_provider.dart';
 import 'package:first_app/utils/shared_prefences.dart';
 import 'package:flutter/material.dart';
@@ -13,28 +14,46 @@ import 'package:provider/provider.dart';
 void main() {
   SystemChrome.setSystemUIOverlayStyle(
       SystemUiOverlayStyle(statusBarColor: Color(0xff26872f)));
-  runApp(const MyApp());
+  runApp(MyApp());
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class MyApp extends StatefulWidget {
+  MyApp({super.key});
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  ConstantColors constantColors = ConstantColors();
 
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    ConstantColors constantColors = ConstantColors();
     // Future<User?> getUserData() => UserPreferences().getUser();
-    return MaterialApp(
-        debugShowCheckedModeBanner: false,
-        theme: ThemeData(
-          appBarTheme: AppBarTheme(
+    return ChangeNotifierProvider(
+      create: (context) => ThemeProvider(),
+      builder: (context, _) {
+        final themeprovider =
+            Provider.of<ThemeProvider>(context, listen: false);
+
+        return MaterialApp(
+            debugShowCheckedModeBanner: false,
+            themeMode: themeprovider.themeMode,
+            darkTheme: Mytheme.darkTheme,
+            theme:
+                themeprovider.isDarkMode ? ThemeData.dark() : ThemeData.light(),
+
+            // appBarTheme: AppBarTheme(
             // color: Color(0xff26872f),
             // backgroundColor: Color(0xff26872f)
-            systemOverlayStyle: SystemUiOverlayStyle.light,
-          ),
-          // primaryColor: constantColors.whiteColor,
-          fontFamily: 'TitilliumWeb',
-        ),
-        home: SplashScreen());
+            //   systemOverlayStyle: SystemUiOverlayStyle.light,
+            // ),
+            // primaryColor: constantColors.whiteColor,
+            //   fontFamily: 'TitilliumWeb',
+            // ),
+            home: SplashScreen());
+      },
+    );
   }
 }

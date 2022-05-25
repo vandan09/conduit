@@ -33,14 +33,14 @@ class _NewArticlePageState extends State<NewArticlePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        iconTheme: IconThemeData(color: constantColors.greenColor),
-        backgroundColor: constantColors.whiteColor,
+        iconTheme: IconThemeData(color: constantColors.whiteColor),
+        backgroundColor: constantColors.greenColor,
         title: SizedBox(
           child: Text(
             'New Article',
             overflow: TextOverflow.visible,
             style: TextStyle(
-                color: constantColors.greenColor, fontWeight: FontWeight.bold),
+                color: constantColors.whiteColor, fontWeight: FontWeight.bold),
           ),
         ),
       ),

@@ -5,6 +5,7 @@ import 'package:first_app/Screens/Drawer/new_article.dart';
 import 'package:first_app/Screens/others/client_profile.dart';
 import 'package:first_app/Screens/others/readmore_page.dart';
 import 'package:first_app/Screens/others/tag_screen.dart';
+import 'package:first_app/Widget/ChangeThemeButtonWidget.dart';
 
 import 'package:first_app/Widget/buttomAppBar.dart';
 import 'package:first_app/Screens/Drawer/setting_page.dart';
@@ -25,7 +26,7 @@ final List<String> imgList = [
 ];
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+  HomeScreen({super.key});
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -467,6 +468,9 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           style: TextStyle(
               color: constantColors.whiteColor, fontWeight: FontWeight.bold),
         ),
+        actions: [
+          ChangeThemeButtonWidget(),
+        ],
       ),
       drawer: Drawer(
         backgroundColor: constantColors.whiteColor,

@@ -159,11 +159,12 @@ class _SignupPageState extends State<SignupPage> {
                               onTap: () {
                                 // auth.loggedInStatus == Status.Authenticating
                                 // ? CircularProgressIndicator()
-
-                                _registerModel = doRegister(
-                                    usernameController.text,
-                                    emailController.text,
-                                    passwordController.text);
+                                setState(() {
+                                  _registerModel = doRegister(
+                                      usernameController.text,
+                                      emailController.text,
+                                      passwordController.text);
+                                });
                               },
                               child: CustomRaisedButton(
                                 buttonText: 'Sign up',

@@ -36,7 +36,7 @@ class _ProfilePageState extends State<ProfilePage>
   @override
   void initState() {
     super.initState();
-    _registerWelcome = API_Manager().getUserDetails();
+    // _registerWelcome = API_Manager().getUserDetails();
 
     _tabController = TabController(length: 2, vsync: this);
     super.initState();
@@ -46,14 +46,14 @@ class _ProfilePageState extends State<ProfilePage>
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        iconTheme: IconThemeData(color: constantColors.greenColor),
-        backgroundColor: constantColors.whiteColor,
+        iconTheme: IconThemeData(color: constantColors.whiteColor),
+        backgroundColor: constantColors.greenColor,
         title: SizedBox(
           child: Text(
             'Profile',
             overflow: TextOverflow.visible,
             style: TextStyle(
-                color: constantColors.greenColor, fontWeight: FontWeight.bold),
+                color: constantColors.whiteColor, fontWeight: FontWeight.bold),
           ),
         ),
       ),
@@ -80,7 +80,8 @@ class _ProfilePageState extends State<ProfilePage>
                         color: Colors.grey.shade700,
                       ),
                       Text(
-                        snapshot.data!.user.username,
+                        // snapshot.data!.user.username,
+                        "Vandan",
                         style: TextStyle(
                             fontSize: MediaQuery.of(context).size.height * 0.03,
                             color: constantColors.greyColor,

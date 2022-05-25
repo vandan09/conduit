@@ -35,14 +35,14 @@ class _ReadMorePageState extends State<ReadMorePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        iconTheme: IconThemeData(color: constantColors.greenColor),
-        backgroundColor: constantColors.whiteColor,
+        iconTheme: IconThemeData(color: constantColors.whiteColor),
+        backgroundColor: constantColors.greenColor,
         title: SizedBox(
           child: Text(
             'Article',
             overflow: TextOverflow.visible,
             style: TextStyle(
-                color: constantColors.greenColor, fontWeight: FontWeight.bold),
+                color: constantColors.whiteColor, fontWeight: FontWeight.bold),
           ),
         ),
       ),
@@ -50,7 +50,7 @@ class _ReadMorePageState extends State<ReadMorePage> {
           child: Column(
         children: [
           Container(
-            height: MediaQuery.of(context).size.height * 0.4,
+            height: MediaQuery.of(context).size.height * 0.3,
             width: MediaQuery.of(context).size.width,
             color: Color(0xff333333),
             // child: Padding(
@@ -178,21 +178,20 @@ class _ReadMorePageState extends State<ReadMorePage> {
               height: 250,
               child: Column(
                 children: [
-                  Expanded(
-                    flex: 2,
-                    child: Container(
-                      color: constantColors.whiteColor,
-                      child: TextField(
-                        onTap: FocusScope.of(context).unfocus,
-                        keyboardType: TextInputType.multiline,
-                        maxLines: null,
-                        minLines: 5,
-                        textInputAction: TextInputAction.next,
-                        decoration: InputDecoration(
-                            border:
-                                OutlineInputBorder(borderSide: BorderSide.none),
-                            hintText: 'Write a comment'),
-                      ),
+                  Container(
+                    // height: 10,
+                    // width: 400?,
+                    color: constantColors.whiteColor,
+                    child: TextField(
+                      onTap: FocusScope.of(context).unfocus,
+                      keyboardType: TextInputType.multiline,
+                      maxLines: null,
+                      minLines: 5,
+                      textInputAction: TextInputAction.next,
+                      decoration: InputDecoration(
+                          border:
+                              OutlineInputBorder(borderSide: BorderSide.none),
+                          hintText: 'Write a comment'),
                     ),
                   ),
                   Expanded(
