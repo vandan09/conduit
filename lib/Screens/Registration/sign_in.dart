@@ -7,7 +7,7 @@ import 'package:first_app/Widget/customRaisedButton.dart';
 import 'package:first_app/constants/Constantcolors.dart';
 import 'package:first_app/constants/constant_strings.dart';
 import 'package:first_app/model/user_model.dart';
-import 'package:first_app/provider/auth_provider.dart';
+
 import 'package:first_app/provider/user_provider.dart';
 import 'package:first_app/services/api.dart';
 import 'package:first_app/utils/validation.dart';
@@ -33,8 +33,21 @@ class _LogInPageState extends State<LogInPage> {
   Future<RegisterWelcome>? _registerModel;
 
   String? _userEmail, _password;
-  Future<RegisterWelcome> doLoggedin(String email, String password) async {
+  void doLoggedin(String email, String password) async {
     if (_formkey.currentState!.validate()) {
+      showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              backgroundColor: constantColors.transperant,
+              actions: [
+                Center(
+                    child: CircularProgressIndicator(
+                  color: constantColors.greenColor,
+                ))
+              ],
+            );
+          });
       _formkey.currentState!.save();
       print('valid');
       var userBody = <String, dynamic>{
@@ -53,11 +66,25 @@ class _LogInPageState extends State<LogInPage> {
           Navigator.pushReplacement(
               context, MaterialPageRoute(builder: ((context) => HomeScreen())));
           // print('Account Created successfully');
-          return RegisterWelcome.fromJson(jsonDecode(response.body));
+          RegisterWelcome.fromJson(jsonDecode(response.body));
         } else {
-          throw Exception('Failed to create model. ${response.body}');
+          String str1 = jsonDecode(response.body).toString();
+          String str2 =
+              str1.replaceAll(new RegExp(r"\p{P}", unicode: true), "");
+          String error = str2.substring(7);
+          Navigator.pop(context);
+          // Navigator.pop(context);
+          // ignore: use_build_context_synchronously
+
+          Flushbar(
+            title: 'Invalid form',
+            message: '${error}',
+            duration: Duration(seconds: 3),
+          ).show(context);
         }
       } catch (e) {
+        Navigator.pop(context);
+
         print(e);
       }
     } else {
@@ -67,7 +94,6 @@ class _LogInPageState extends State<LogInPage> {
         duration: Duration(seconds: 2),
       ).show(context);
     }
-    throw 'error';
   }
 
   @override
@@ -138,8 +164,7 @@ class _LogInPageState extends State<LogInPage> {
                         child: GestureDetector(
                             onTap: () {
                               setState(() {
-                                _registerModel = doLoggedin(
-                                    emailController.text,
+                                doLoggedin(emailController.text,
                                     passwordController.text);
                               });
 

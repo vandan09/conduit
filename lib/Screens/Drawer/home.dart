@@ -47,7 +47,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   String selected = "Global Feed";
 
   String selectDrawer = 'home';
-
+  int? len = 0;
   final check = List.generate(10, (index) => index * 2);
   final tagName = [
     'welcome',
@@ -55,6 +55,41 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     'introduction',
     'codebaseShow'
   ];
+
+  chechDesc(String desc, title, name, DateTime date, String image) {
+    if (desc.length > 20) {
+      String s1 = desc.substring(0, 49);
+
+      return Container(
+        width: 250,
+        child: Row(
+          children: [
+            Flexible(
+              child: Text(
+                s1,
+                style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+            GestureDetector(
+              onTap: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: ((context) =>
+                            ReadMorePage(title, name, desc, date, image))));
+              },
+              child: Text(
+                'see more',
+                style:
+                    TextStyle(fontSize: 12, color: constantColors.greenColor),
+              ),
+            )
+          ],
+        ),
+      );
+    }
+  }
 
   final List<Widget> imageSliders = imgList
       .map((item) => Container(
@@ -90,37 +125,259 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           ))
       .toList();
 
-  // int? selectedIndex;
-  _setIndex(bool index) {
-    setState(() {
-      index = false;
-    });
-  }
-
-  _unSet(bool index) {
-    setState(() {
-      index = false;
-    });
-  }
-
-  bool _checkColor(bool index) {
-    if (index == true) {
-      return true;
-    } else {
-      return false;
-    }
-  }
-
   Widget yourFeed() {
-    return Container(
-      height: 20,
-      padding: EdgeInsets.all(20),
-      // margin: EdgeInsets.only(right: 10, top: 20),
-      child: Text(
-        'No articles are here... yet.',
-        style: TextStyle(fontSize: 15),
-      ),
-    );
+    final orientation = MediaQuery.of(context).orientation;
+    return FutureBuilder<Welcome>(
+        future: _articleModel,
+        builder: (context, snapshot) {
+          if (snapshot.hasData) {
+            return GridView.builder(
+              itemCount: snapshot.data!.articles.length,
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount:
+                      (orientation == Orientation.portrait) ? 2 : 4),
+              itemBuilder: (BuildContext context, int index) {
+                var article = snapshot.data!.articles[index];
+                String authorName = article.author.username;
+                List tag = article.tagList;
+                return Padding(
+                  padding: const EdgeInsets.all(2),
+                  child: Card(
+                      elevation: 5,
+                      shadowColor: Colors.black,
+                      child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            // CachedNetworkImage(),
+                            ListTile(
+                              // like button
+                              trailing: GestureDetector(
+                                onTap: () {
+                                  setState(() {
+                                    article.favorited = true;
+                                  });
+                                },
+                                onLongPress: () {
+                                  setState(() {
+                                    article.favorited = false;
+                                  });
+                                },
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                      color: article.favorited == true
+                                          ? constantColors.greenColor
+                                          : constantColors.whiteColor,
+                                      // _checkColor(index);
+                                      border: Border.all(
+                                          color: constantColors.greenColor),
+                                      borderRadius:
+                                          BorderRadius.all(Radius.circular(5))),
+                                  // alignment: AlignmentDirectional.center,
+                                  // alignment: Alignment.topRight,
+                                  height: 20,
+                                  width: 20,
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Icon(
+                                        Icons.favorite,
+                                        color: article.favorited == true
+                                            ? constantColors.whiteColor
+                                            : constantColors.greenColor,
+                                        size: 10,
+                                      ),
+                                      // SizedBox(
+                                      //   width: 2,
+                                      // ),
+                                      // Text(
+                                      //   '${article.favoritesCount}',
+                                      //   style: TextStyle(
+                                      //       color: article.favorited == true
+                                      //           ? constantColors.whiteColor
+                                      //           : constantColors.greenColor,
+                                      //       fontSize: 16),
+                                      // )
+                                    ],
+                                  ),
+                                ),
+                              ),
+                              //author image
+                              leading: CachedNetworkImage(
+                                width: 25,
+                                height: 40,
+                                imageBuilder: (context, imageProvider) =>
+                                    Container(
+                                  // width: 15.0,
+                                  // height: 30.0,
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    image: DecorationImage(
+                                        image: imageProvider,
+                                        fit: BoxFit.cover),
+                                  ),
+                                ),
+                                progressIndicatorBuilder:
+                                    (context, url, progress) => Center(
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    color: constantColors.greenColor,
+                                    value: progress.progress,
+                                  ),
+                                ),
+                                imageUrl: article.author.image,
+                              ),
+
+                              //author name
+
+                              title: GestureDetector(
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) =>
+                                            ClientProfilePapge(authorName,
+                                                article.author.image)),
+                                  );
+                                },
+                                child: Text(
+                                  authorName,
+                                  style: TextStyle(
+                                      color: constantColors.greenColor,
+                                      fontSize: 14),
+                                ),
+                              ),
+                              //date
+                              subtitle: Text(
+                                '${article.createdAt.month}/${article.createdAt.day}/${article.createdAt.year}',
+                                style: TextStyle(
+                                    color: constantColors.greyColor,
+                                    fontSize: 10),
+                              ),
+                            ),
+                            Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 10),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  //title
+                                  GestureDetector(
+                                      onTap: () {
+                                        Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (context) =>
+                                                    ReadMorePage(
+                                                        article.title,
+                                                        authorName,
+                                                        article.description,
+                                                        article.createdAt,
+                                                        article.author.image)));
+                                      },
+                                      child: Text(
+                                        article.title,
+                                        style: TextStyle(
+                                            color: constantColors.darkColor,
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 14),
+                                      )),
+                                  SizedBox(
+                                    height: 5,
+                                  ),
+                                  //descripton
+                                  chechDesc(
+                                      article.description,
+                                      article.title,
+                                      article.author.username,
+                                      article.createdAt,
+                                      article.author.image),
+
+                                  //articles tags
+
+                                  Padding(
+                                    padding: const EdgeInsets.only(top: 8.0),
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Container(
+                                          height: 50,
+                                          width: 100,
+                                          // padding: EdgeInsets.all(3),
+                                          child: ListView.builder(
+                                            scrollDirection: Axis.vertical,
+                                            physics:
+                                                NeverScrollableScrollPhysics(),
+                                            shrinkWrap: true,
+                                            itemCount: tag.length,
+                                            itemBuilder: ((context, index) {
+                                              return Column(
+                                                children: [
+                                                  Padding(
+                                                    padding:
+                                                        const EdgeInsets.only(
+                                                            top: 3.0),
+                                                    child: GestureDetector(
+                                                      onTap: () {
+                                                        Navigator.push(
+                                                            context,
+                                                            MaterialPageRoute(
+                                                                builder:
+                                                                    (context) =>
+                                                                        TagScreen(
+                                                                          '${tag[index]}',
+                                                                        )));
+                                                      },
+                                                      child: Container(
+                                                          // width: 90,
+                                                          decoration:
+                                                              BoxDecoration(
+                                                                  border: Border
+                                                                      .all(
+                                                                    color: Colors
+                                                                        .grey
+                                                                        .shade400,
+                                                                  ),
+                                                                  borderRadius:
+                                                                      BorderRadius
+                                                                          .circular(
+                                                                              30)),
+                                                          child: Center(
+                                                              child: Text(
+                                                            tag[index],
+                                                            style: TextStyle(
+                                                                color: Colors
+                                                                    .grey
+                                                                    .shade400,
+                                                                fontSize: 10),
+                                                          ))),
+                                                    ),
+                                                  ),
+                                                ],
+                                              );
+                                            }),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ])),
+                );
+              },
+            );
+          } else {
+            return Padding(
+              padding: const EdgeInsets.all(20.0),
+              child: Center(
+                  child: CircularProgressIndicator(
+                      color: constantColors.greenColor)),
+            );
+          }
+        });
   }
 
   Widget customerListView() {
@@ -143,228 +400,251 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                         padding: const EdgeInsets.only(
                             top: 15.0, left: 15, right: 15),
                         child: Card(
+                            elevation: 5,
+                            shadowColor: Colors.black,
                             child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                              // CachedNetworkImage(),
-                              ListTile(
-                                // like button
-                                trailing: GestureDetector(
-                                  onTap: () {
-                                    setState(() {
-                                      article.favorited = true;
-                                    });
-                                  },
-                                  onLongPress: () {
-                                    setState(() {
-                                      article.favorited = false;
-                                    });
-                                  },
-                                  child: Container(
-                                    decoration: BoxDecoration(
-                                        color: article.favorited == true
-                                            ? constantColors.greenColor
-                                            : constantColors.whiteColor,
-                                        // _checkColor(index);
-                                        border: Border.all(
-                                            color: constantColors.greenColor),
-                                        borderRadius: BorderRadius.all(
-                                            Radius.circular(5))),
-                                    // alignment: AlignmentDirectional.center,
-                                    // alignment: Alignment.topRight,
-                                    height: 35,
-                                    width: 80,
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        Icon(
-                                          Icons.favorite,
-                                          color: article.favorited == true
-                                              ? constantColors.whiteColor
-                                              : constantColors.greenColor,
-                                          size: 20,
-                                        ),
-                                        SizedBox(
-                                          width: 2,
-                                        ),
-                                        Text(
-                                          '${article.favoritesCount}',
-                                          style: TextStyle(
+                                  // CachedNetworkImage(),
+                                  ListTile(
+                                    // like button
+                                    trailing: GestureDetector(
+                                      onTap: () {
+                                        setState(() {
+                                          article.favorited = true;
+                                          len = article.favorited
+                                              ? len! + 1
+                                              : len;
+                                        });
+                                      },
+                                      onLongPress: () {
+                                        setState(() {
+                                          article.favorited = false;
+
+                                          len = article.favorited
+                                              ? len
+                                              : len! - 1;
+                                        });
+                                      },
+                                      child: Container(
+                                        decoration: BoxDecoration(
+                                            color: article.favorited == true
+                                                ? constantColors.greenColor
+                                                : constantColors.whiteColor,
+                                            // _checkColor(index);
+                                            border: Border.all(
+                                                color:
+                                                    constantColors.greenColor),
+                                            borderRadius: BorderRadius.all(
+                                                Radius.circular(5))),
+                                        // alignment: AlignmentDirectional.center,
+                                        // alignment: Alignment.topRight,
+                                        height: 35,
+                                        width: 80,
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: [
+                                            Icon(
+                                              Icons.favorite,
                                               color: article.favorited == true
                                                   ? constantColors.whiteColor
                                                   : constantColors.greenColor,
-                                              fontSize: 16),
-                                        )
+                                              size: 20,
+                                            ),
+                                            SizedBox(
+                                              width: 2,
+                                            ),
+                                            Text(
+                                              '${article.favoritesCount}',
+                                              style: TextStyle(
+                                                  color:
+                                                      article.favorited == true
+                                                          ? constantColors
+                                                              .whiteColor
+                                                          : constantColors
+                                                              .greenColor,
+                                                  fontSize: 16),
+                                            )
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                    //author image
+                                    leading: CachedNetworkImage(
+                                      width: 50,
+                                      height: 50,
+                                      imageBuilder: (context, imageProvider) =>
+                                          Container(
+                                        width: 80.0,
+                                        height: 80.0,
+                                        decoration: BoxDecoration(
+                                          shape: BoxShape.circle,
+                                          image: DecorationImage(
+                                              image: imageProvider,
+                                              fit: BoxFit.cover),
+                                        ),
+                                      ),
+                                      progressIndicatorBuilder:
+                                          (context, url, progress) => Center(
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 5,
+                                          color: constantColors.greenColor,
+                                          value: progress.progress,
+                                        ),
+                                      ),
+                                      imageUrl: article.author.image,
+                                    ),
+
+                                    //author name
+
+                                    title: GestureDetector(
+                                      onTap: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (context) =>
+                                                  ClientProfilePapge(authorName,
+                                                      article.author.image)),
+                                        );
+                                      },
+                                      child: Text(
+                                        authorName,
+                                        style: TextStyle(
+                                            color: constantColors.greenColor),
+                                      ),
+                                    ),
+                                    //date
+                                    subtitle: Text(
+                                      '${article.createdAt.month}/${article.createdAt.day}/${article.createdAt.year}',
+                                      style: TextStyle(
+                                          color: constantColors.greyColor,
+                                          fontSize: 12),
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 20),
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        //title
+                                        GestureDetector(
+                                            onTap: () {
+                                              Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                      builder: (context) =>
+                                                          ReadMorePage(
+                                                              article.title,
+                                                              authorName,
+                                                              article
+                                                                  .description,
+                                                              article.createdAt,
+                                                              article.author
+                                                                  .image)));
+                                            },
+                                            child: Text(
+                                              article.title,
+                                              style: TextStyle(
+                                                  color:
+                                                      constantColors.darkColor,
+                                                  fontWeight: FontWeight.bold,
+                                                  fontSize: 18),
+                                            )),
+                                        //descripton
+                                        GestureDetector(
+                                            child: ReadMoreText(
+                                          trimLines: 2,
+                                          colorClickableText:
+                                              constantColors.greenColor,
+                                          trimMode: TrimMode.Line,
+                                          trimCollapsedText: 'Read more',
+                                          trimExpandedText: ' Show less',
+                                          article.description,
+                                          style: TextStyle(
+                                              color: constantColors.greyColor,
+                                              fontSize: 14),
+                                        )),
+
+                                        SizedBox(
+                                          height: 10,
+                                        ),
+                                        //articles tags
+
+                                        Container(
+                                          height: 40,
+                                          width:
+                                              MediaQuery.of(context).size.width,
+                                          padding: EdgeInsets.all(3),
+                                          child: ListView.builder(
+                                            scrollDirection: Axis.horizontal,
+                                            physics:
+                                                NeverScrollableScrollPhysics(),
+                                            shrinkWrap: true,
+                                            itemCount: tag.length,
+                                            itemBuilder: ((context, index) {
+                                              return Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.start,
+                                                children: [
+                                                  GestureDetector(
+                                                    onTap: () {
+                                                      Navigator.push(
+                                                          context,
+                                                          MaterialPageRoute(
+                                                              builder:
+                                                                  (context) =>
+                                                                      TagScreen(
+                                                                        '${tag[index]}',
+                                                                      )));
+                                                    },
+                                                    child: Padding(
+                                                      padding:
+                                                          const EdgeInsets.only(
+                                                              right: 8.0),
+                                                      child: Container(
+                                                          width: 130,
+                                                          height: 30,
+                                                          decoration:
+                                                              BoxDecoration(
+                                                                  border: Border
+                                                                      .all(
+                                                                    color: Colors
+                                                                        .grey
+                                                                        .shade400,
+                                                                  ),
+                                                                  borderRadius:
+                                                                      BorderRadius
+                                                                          .circular(
+                                                                              30)),
+                                                          child: Center(
+                                                              child: Text(
+                                                            tag[index],
+                                                            style: TextStyle(
+                                                                color: Colors
+                                                                    .grey
+                                                                    .shade400,
+                                                                fontSize: 13),
+                                                          ))),
+                                                    ),
+                                                  )
+                                                ],
+                                              );
+                                            }),
+                                          ),
+                                        ),
+                                        SizedBox(
+                                          height: 10,
+                                        ),
                                       ],
                                     ),
                                   ),
-                                ),
-                                //author image
-                                leading: CachedNetworkImage(
-                                  width: 50,
-                                  height: 50,
-                                  imageBuilder: (context, imageProvider) =>
-                                      Container(
-                                    width: 80.0,
-                                    height: 80.0,
-                                    decoration: BoxDecoration(
-                                      shape: BoxShape.circle,
-                                      image: DecorationImage(
-                                          image: imageProvider,
-                                          fit: BoxFit.cover),
-                                    ),
-                                  ),
-                                  progressIndicatorBuilder:
-                                      (context, url, progress) => Center(
-                                    child: CircularProgressIndicator(
-                                      strokeWidth: 5,
-                                      color: constantColors.greenColor,
-                                      value: progress.progress,
-                                    ),
-                                  ),
-                                  imageUrl: article.author.image,
-                                ),
-
-                                //author name
-
-                                title: GestureDetector(
-                                  onTap: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) =>
-                                              ClientProfilePapge(authorName,
-                                                  article.author.image)),
-                                    );
-                                  },
-                                  child: Text(
-                                    authorName,
-                                    style: TextStyle(
-                                        color: constantColors.greenColor),
-                                  ),
-                                ),
-                                //date
-                                subtitle: Text(
-                                  '${article.createdAt.month}/${article.createdAt.day}/${article.createdAt.year}',
-                                  style: TextStyle(
-                                      color: constantColors.greyColor,
-                                      fontSize: 12),
-                                ),
-                              ),
-                              Padding(
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 20),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    //title
-                                    GestureDetector(
-                                        onTap: () {
-                                          Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                  builder: (context) =>
-                                                      ReadMorePage(
-                                                          article.title,
-                                                          authorName,
-                                                          article.description,
-                                                          article.createdAt,
-                                                          article
-                                                              .author.image)));
-                                        },
-                                        child: Text(
-                                          article.title,
-                                          style: TextStyle(
-                                              color: constantColors.darkColor,
-                                              fontWeight: FontWeight.bold,
-                                              fontSize: 18),
-                                        )),
-                                    //descripton
-                                    GestureDetector(
-                                        child: ReadMoreText(
-                                      trimLines: 2,
-                                      colorClickableText:
-                                          constantColors.greenColor,
-                                      trimMode: TrimMode.Line,
-                                      trimCollapsedText: 'Read more',
-                                      trimExpandedText: ' Show less',
-                                      article.description,
-                                      style: TextStyle(
-                                          color: constantColors.greyColor,
-                                          fontSize: 14),
-                                    )),
-
-                                    SizedBox(
-                                      height: 10,
-                                    ),
-                                    //articles tags
-
-                                    Container(
-                                      height: 40,
-                                      width: MediaQuery.of(context).size.width,
-                                      padding: EdgeInsets.all(3),
-                                      child: ListView.builder(
-                                        scrollDirection: Axis.horizontal,
-                                        physics: NeverScrollableScrollPhysics(),
-                                        shrinkWrap: true,
-                                        itemCount: tag.length,
-                                        itemBuilder: ((context, index) {
-                                          return Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.start,
-                                            children: [
-                                              GestureDetector(
-                                                onTap: () {
-                                                  Navigator.push(
-                                                      context,
-                                                      MaterialPageRoute(
-                                                          builder: (context) =>
-                                                              TagScreen(
-                                                                '${tag[index]}',
-                                                              )));
-                                                },
-                                                child: Padding(
-                                                  padding:
-                                                      const EdgeInsets.only(
-                                                          right: 8.0),
-                                                  child: Container(
-                                                      width: 130,
-                                                      height: 30,
-                                                      decoration: BoxDecoration(
-                                                          border: Border.all(
-                                                            color: Colors
-                                                                .grey.shade400,
-                                                          ),
-                                                          borderRadius:
-                                                              BorderRadius
-                                                                  .circular(
-                                                                      30)),
-                                                      child: Center(
-                                                          child: Text(
-                                                        tag[index],
-                                                        style: TextStyle(
-                                                            color: Colors
-                                                                .grey.shade400,
-                                                            fontSize: 13),
-                                                      ))),
-                                                ),
-                                              )
-                                            ],
-                                          );
-                                        }),
-                                      ),
-                                    ),
-                                    SizedBox(
-                                      height: 10,
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              SizedBox(
-                                height: 10,
-                              )
-                            ])),
+                                  SizedBox(
+                                    height: 10,
+                                  )
+                                ])),
                       );
                     }));
               } else {
@@ -379,9 +659,10 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           ),
           //popular tags
           Padding(
-            padding: const EdgeInsets.only(top: 20.0, right: 20, left: 20),
+            padding: const EdgeInsets.only(
+                top: 20.0, right: 20, left: 20, bottom: 0),
             child: Container(
-              padding: EdgeInsets.only(top: 5),
+              padding: EdgeInsets.only(top: 20),
               alignment: Alignment.center,
               child: Text(
                 "Popular Tags",
@@ -394,21 +675,22 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                     topLeft: Radius.circular(5), topRight: Radius.circular(5)),
               ),
               // padding: EdgeInsets.all(15),
-              height: MediaQuery.of(context).size.height * 0.05,
+              height: MediaQuery.of(context).size.height * 0.08,
               width: MediaQuery.of(context).size.width,
             ),
           ),
           Padding(
-            padding: const EdgeInsets.only(right: 20, left: 20, bottom: 20),
+            padding: const EdgeInsets.only(right: 20, left: 20, bottom: 0),
             child: Container(
+              padding: EdgeInsets.only(bottom: 30, left: 15, right: 15),
               decoration: BoxDecoration(
                   color: Colors.grey.shade300,
                   border: Border.all(color: Colors.grey.shade300),
                   borderRadius: BorderRadius.only(
                       bottomLeft: Radius.circular(5),
                       bottomRight: Radius.circular(5))),
-              padding: EdgeInsets.all(15),
-              height: MediaQuery.of(context).size.height * 0.15,
+              // padding: EdgeInsets.all(15),
+              height: MediaQuery.of(context).size.height * 0.12,
               width: MediaQuery.of(context).size.width,
               child: ListView.builder(
                 shrinkWrap: true,
@@ -469,6 +751,16 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               color: constantColors.whiteColor, fontWeight: FontWeight.bold),
         ),
         actions: [
+          Center(
+            child: buildCustomeBadge(
+              len!,
+              child: Icon(
+                Icons.favorite,
+                color: constantColors.whiteColor,
+                size: 30,
+              ),
+            ),
+          ),
           ChangeThemeButtonWidget(),
         ],
       ),
@@ -510,11 +802,11 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 child: ListTile(
                   leading: Icon(
                     Icons.home,
-                    color: Colors.black,
+                    color: Colors.white,
                   ),
                   title: const Text(
                     'Home',
-                    style: TextStyle(color: Colors.black, fontSize: 17),
+                    style: TextStyle(color: Colors.white, fontSize: 17),
                   ),
                   onTap: () {
                     Navigator.push(context,
@@ -604,6 +896,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           ),
 
           TabBar(
+
               // overlayColor: Colors.orange,
               labelColor: constantColors.greenColor,
               unselectedLabelColor: constantColors.greyColor,
@@ -636,4 +929,30 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       bottomNavigationBar: BottomAppBarPage(),
     );
   }
+}
+
+Widget buildCustomeBadge(
+  int i, {
+  required Widget child,
+}) {
+  final text = i.toString();
+  return Stack(
+    children: [
+      child,
+      Positioned(
+          top: 0,
+          right: 0,
+          child: CircleAvatar(
+            backgroundColor: Colors.redAccent,
+            radius: 8,
+            child: Text(
+              text,
+              style: TextStyle(
+                  fontSize: 12,
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold),
+            ),
+          ))
+    ],
+  );
 }

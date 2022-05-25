@@ -39,9 +39,21 @@ class _SignupPageState extends State<SignupPage> {
   final GlobalKey<FormState> _formkey = GlobalKey<FormState>();
 
   // String? _userName, _userEmail, _password;
-  Future<RegisterWelcome> doRegister(
-      String name, String email, String password) async {
+  void doRegister(String name, String email, String password) async {
     if (_formkey.currentState!.validate()) {
+      showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              backgroundColor: constantColors.transperant,
+              actions: [
+                Center(
+                    child: CircularProgressIndicator(
+                  color: constantColors.greenColor,
+                ))
+              ],
+            );
+          });
       _formkey.currentState!.save();
       print('valid');
       var userBody = <String, dynamic>{
@@ -60,14 +72,26 @@ class _SignupPageState extends State<SignupPage> {
         if (response.statusCode == 200) {
           print('Accont created');
 
-          return RegisterWelcome.fromJson(jsonDecode(response.body));
+          RegisterWelcome.fromJson(jsonDecode(response.body));
           // Navigator.pushReplacement(
           //     context, MaterialPageRoute(builder: ((context) => LogInPage())));
           // print('Account Created successfully');
         } else {
-          throw Exception('Failed to create model. ${response.body}');
+          String str1 = jsonDecode(response.body).toString();
+          String str2 =
+              str1.replaceAll(new RegExp(r"\p{P}", unicode: true), "");
+          String error = str2.substring(7);
+          Navigator.pop(context);
+
+          Flushbar(
+            title: 'Invalid form',
+            message: '${error}',
+            duration: Duration(seconds: 3),
+          ).show(context);
         }
       } catch (e) {
+        Navigator.pop(context);
+
         print(e);
       }
     } else {
@@ -77,7 +101,6 @@ class _SignupPageState extends State<SignupPage> {
         duration: Duration(seconds: 2),
       ).show(context);
     }
-    throw 'error';
   }
 
   @override
@@ -160,7 +183,7 @@ class _SignupPageState extends State<SignupPage> {
                                 // auth.loggedInStatus == Status.Authenticating
                                 // ? CircularProgressIndicator()
                                 setState(() {
-                                  _registerModel = doRegister(
+                                  doRegister(
                                       usernameController.text,
                                       emailController.text,
                                       passwordController.text);
