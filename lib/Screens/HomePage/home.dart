@@ -1,29 +1,22 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_slider/carousel_slider.dart';
-import 'package:first_app/Screens/Drawer/profile.dart';
-import 'package:first_app/Screens/Drawer/new_article.dart';
+import 'package:first_app/Screens/Drawer/drawer.dart';
+
+import 'package:first_app/Screens/HomePage/homepage_helper.dart';
 import 'package:first_app/Screens/others/client_profile.dart';
 import 'package:first_app/Screens/others/readmore_page.dart';
 import 'package:first_app/Screens/others/tag_screen.dart';
 import 'package:first_app/Widget/ChangeThemeButtonWidget.dart';
 
 import 'package:first_app/Widget/buttomAppBar.dart';
-import 'package:first_app/Screens/Drawer/setting_page.dart';
+
 import 'package:first_app/constants/Constantcolors.dart';
-import 'package:first_app/main.dart';
+
 import 'package:first_app/model/article_model.dart';
 import 'package:first_app/services/api.dart';
 import 'package:flutter/material.dart';
 import 'package:readmore/readmore.dart';
 // import 'package:cached_network_image/cached_network_image.dart';
-
-final List<String> imgList = [
-  'assets/images/a.jpg',
-  'assets/images/c2.jpg',
-  'assets/images/c3.jpg',
-  'assets/images/c4.jpg',
-  'assets/images/c5.jpg'
-];
 
 class HomeScreen extends StatefulWidget {
   HomeScreen({super.key});
@@ -46,7 +39,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
   String selected = "Global Feed";
 
-  String selectDrawer = 'home';
   int? len = 0;
   final check = List.generate(10, (index) => index * 2);
   final tagName = [
@@ -91,40 +83,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     }
   }
 
-  final List<Widget> imageSliders = imgList
-      .map((item) => Container(
-            child: Container(
-              margin: EdgeInsets.all(5.0),
-              child: ClipRRect(
-                  borderRadius: BorderRadius.all(Radius.circular(0.0)),
-                  child: Stack(
-                    children: <Widget>[
-                      Image.asset(item, fit: BoxFit.cover, width: 1000.0),
-                      Positioned(
-                        bottom: 0.0,
-                        left: 0.0,
-                        right: 0.0,
-                        child: Container(
-                          decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              colors: [
-                                Color.fromARGB(200, 0, 0, 0),
-                                Color.fromARGB(0, 0, 0, 0)
-                              ],
-                              begin: Alignment.bottomCenter,
-                              end: Alignment.topCenter,
-                            ),
-                          ),
-                          padding: EdgeInsets.symmetric(
-                              vertical: 5.0, horizontal: 20.0),
-                        ),
-                      ),
-                    ],
-                  )),
-            ),
-          ))
-      .toList();
-
   Widget yourFeed() {
     final orientation = MediaQuery.of(context).orientation;
     return FutureBuilder<Welcome>(
@@ -141,7 +99,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 String authorName = article.author.username;
                 List tag = article.tagList;
                 return Padding(
-                  padding: const EdgeInsets.all(2),
+                  padding: const EdgeInsets.only(left: 2, top: 2),
                   child: Card(
                       elevation: 5,
                       shadowColor: Colors.black,
@@ -155,12 +113,22 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                               trailing: GestureDetector(
                                 onTap: () {
                                   setState(() {
+                                    setState(() {
+                                      if (article.favorited == false) {
+                                        article.favorited = true;
+                                        len =
+                                            article.favorited ? len! + 1 : len;
+                                      }
+                                    });
                                     article.favorited = true;
                                   });
                                 },
                                 onLongPress: () {
                                   setState(() {
-                                    article.favorited = false;
+                                    if (article.favorited == true) {
+                                      article.favorited = false;
+                                      len = article.favorited ? len! : len! - 1;
+                                    }
                                   });
                                 },
                                 child: Container(
@@ -204,7 +172,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                               ),
                               //author image
                               leading: CachedNetworkImage(
-                                width: 25,
+                                width: 35,
                                 height: 40,
                                 imageBuilder: (context, imageProvider) =>
                                     Container(
@@ -220,7 +188,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                 progressIndicatorBuilder:
                                     (context, url, progress) => Center(
                                   child: CircularProgressIndicator(
-                                    strokeWidth: 2,
+                                    strokeWidth: 1,
                                     color: constantColors.greenColor,
                                     value: progress.progress,
                                   ),
@@ -411,19 +379,22 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                     trailing: GestureDetector(
                                       onTap: () {
                                         setState(() {
-                                          article.favorited = true;
-                                          len = article.favorited
-                                              ? len! + 1
-                                              : len;
+                                          if (article.favorited == false) {
+                                            article.favorited = true;
+                                            len = article.favorited
+                                                ? len! + 1
+                                                : len;
+                                          }
                                         });
                                       },
                                       onLongPress: () {
                                         setState(() {
-                                          article.favorited = false;
-
-                                          len = article.favorited
-                                              ? len
-                                              : len! - 1;
+                                          if (article.favorited == true) {
+                                            article.favorited = false;
+                                            len = article.favorited
+                                                ? len!
+                                                : len! - 1;
+                                          }
                                         });
                                       },
                                       child: Container(
@@ -764,158 +735,14 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           ChangeThemeButtonWidget(),
         ],
       ),
-      drawer: Drawer(
-        backgroundColor: constantColors.whiteColor,
-        child: ListView(
-          padding: EdgeInsets.all(0),
-
-          // padding: EdgeInsets.symmetric(vertical: 30),
-          children: [
-            SizedBox(
-              height: 90,
-              child: DrawerHeader(
-                  // padding: EdgeInsets.all(0),
-                  child: Container(
-                      child: Text(
-                'conduit',
-                style: TextStyle(
-                    color: constantColors.greenColor,
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold),
-              ))),
-            ),
-            Container(
-              decoration: BoxDecoration(
-                  color: selectDrawer == 'home'
-                      ? constantColors.greenColor
-                      : constantColors.whiteColor,
-                  border: Border.all(color: constantColors.greenColor),
-                  borderRadius: BorderRadius.only(
-                      topRight: Radius.circular(20),
-                      bottomRight: Radius.circular(20))),
-              child: GestureDetector(
-                onTap: () {
-                  setState(() {
-                    selectDrawer = 'home';
-                  });
-                },
-                child: ListTile(
-                  leading: Icon(
-                    Icons.home,
-                    color: Colors.white,
-                  ),
-                  title: const Text(
-                    'Home',
-                    style: TextStyle(color: Colors.white, fontSize: 17),
-                  ),
-                  onTap: () {
-                    Navigator.push(context,
-                        MaterialPageRoute(builder: (context) => HomeScreen()));
-                  },
-                ),
-              ),
-            ),
-            GestureDetector(
-              onTap: () {
-                setState(() {
-                  selectDrawer = 'New Article';
-                });
-              },
-              child: ListTile(
-                leading: Icon(
-                  Icons.edit_note_sharp,
-                  color: Colors.grey,
-                  size: 30,
-                ),
-                title: Text(
-                  'New Article',
-                  style: TextStyle(
-                      color: selectDrawer == 'New Article'
-                          ? Colors.black
-                          : Colors.grey,
-                      fontSize: 17),
-                ),
-                onTap: () {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => NewArticlePage()));
-                },
-              ),
-            ),
-            GestureDetector(
-              child: ListTile(
-                leading: Icon(
-                  Icons.settings,
-                  color: Colors.grey,
-                ),
-                title: const Text(
-                  'Setting',
-                  style: TextStyle(color: Colors.grey, fontSize: 17),
-                ),
-                onTap: () {
-                  Navigator.push(context,
-                      MaterialPageRoute(builder: (context) => SettingPage()));
-                },
-              ),
-            ),
-            GestureDetector(
-              child: ListTile(
-                leading: Icon(
-                  Icons.face,
-                  color: Colors.grey,
-                  size: 30,
-                ),
-                title: const Text(
-                  'Profile',
-                  style: TextStyle(color: Colors.grey, fontSize: 17),
-                ),
-                onTap: () {
-                  Navigator.push(context,
-                      MaterialPageRoute(builder: (context) => ProfilePage()));
-                },
-              ),
-            ),
-          ],
-        ),
-      ),
+      drawer: DrawerWidget(),
       body: SingleChildScrollView(
           child: Column(
         children: [
           //top container //carouseal
 
-          Container(
-            child: CarouselSlider(
-              options: CarouselOptions(
-                autoPlay: true,
-                aspectRatio: 2,
-                enlargeCenterPage: true,
-              ),
-              items: imageSliders,
-            ),
-          ),
+          HomePageHelper().carouselWidget(context),
 
-          TabBar(
-
-              // overlayColor: Colors.orange,
-              labelColor: constantColors.greenColor,
-              unselectedLabelColor: constantColors.greyColor,
-              indicatorColor: Colors.green,
-              controller: _tabController,
-              tabs: const <Widget>[
-                Tab(
-                  child: Text(
-                    'Your Feed',
-                    style: TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                ),
-                Tab(
-                  child: Text(
-                    'Global Feed',
-                    style: TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                ),
-              ]),
           Container(
             height: MediaQuery.of(context).size.height * 1.2,
             width: MediaQuery.of(context).size.width,

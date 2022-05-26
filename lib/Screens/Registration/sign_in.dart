@@ -1,14 +1,13 @@
 import 'dart:convert';
 
 import 'package:another_flushbar/flushbar.dart';
-import 'package:first_app/Screens/Drawer/home.dart';
+import 'package:first_app/Screens/HomePage/home.dart';
 import 'package:first_app/Screens/Registration/signup_page.dart';
 import 'package:first_app/Widget/customRaisedButton.dart';
 import 'package:first_app/constants/Constantcolors.dart';
 import 'package:first_app/constants/constant_strings.dart';
 import 'package:first_app/model/user_model.dart';
 
-import 'package:first_app/provider/user_provider.dart';
 import 'package:first_app/services/api.dart';
 import 'package:first_app/utils/validation.dart';
 import 'package:flutter/material.dart';
