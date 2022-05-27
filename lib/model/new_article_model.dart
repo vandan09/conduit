@@ -1,7 +1,3 @@
-// To parse this JSON data, do
-//
-//     final CreateArticle = welcomeFromJson(jsonString);
-
 import 'dart:convert';
 
 CreateArticle welcomeFromJson(String str) =>

@@ -1,19 +1,19 @@
 import 'dart:convert';
 
 import 'package:another_flushbar/flushbar.dart';
+import 'package:first_app/Screens/HomePage/home.dart';
+import 'package:first_app/Screens/others/new_article.dart';
 import 'package:first_app/Widget/customRaisedButton.dart';
 import 'package:first_app/Screens/Registration/sign_in.dart';
 import 'package:first_app/constants/Constantcolors.dart';
 import 'package:first_app/constants/constant_strings.dart';
 import 'package:first_app/model/user_model.dart';
 
-// import 'package:first_app/provider/auth_provider.dart';
 import 'package:first_app/utils/validation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:http/http.dart' as http;
-
-// import '../../services/api.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class SignupPage extends StatefulWidget {
   const SignupPage({super.key});
@@ -24,7 +24,6 @@ class SignupPage extends StatefulWidget {
 
 class _SignupPageState extends State<SignupPage> {
   // RegisterWelcome? _welcome;
-  Future<RegisterWelcome>? _registerModel;
 
   void initState() {
     super.initState();
@@ -39,6 +38,21 @@ class _SignupPageState extends State<SignupPage> {
   final GlobalKey<FormState> _formkey = GlobalKey<FormState>();
 
   // String? _userName, _userEmail, _password;
+
+  RegisterWelcome? _registerWelcome;
+  SharedPreferences? prefs;
+  String? value;
+
+  saveStringValue(String token) async {
+    prefs = await SharedPreferences.getInstance();
+    prefs!.setString("token", token);
+  }
+
+  saveUsernameValue(String name) async {
+    prefs = await SharedPreferences.getInstance();
+    prefs!.setString("username", name);
+  }
+
   void doRegister(String name, String email, String password) async {
     if (_formkey.currentState!.validate()) {
       showDialog(
@@ -64,7 +78,6 @@ class _SignupPageState extends State<SignupPage> {
         http.Response response = await http.post(
             Uri.parse(Strings.register_url),
             body: json.encode(userBody),
-            // encoding: Encoding.getByName("application/x-www-form-urlencoded"),
             headers: <String, String>{
               "Accept": "application/json",
               "content-type": "application/json"
@@ -72,10 +85,14 @@ class _SignupPageState extends State<SignupPage> {
         if (response.statusCode == 200) {
           print('Accont created');
 
-          RegisterWelcome.fromJson(jsonDecode(response.body));
-          // Navigator.pushReplacement(
-          //     context, MaterialPageRoute(builder: ((context) => LogInPage())));
-          // print('Account Created successfully');
+          _registerWelcome =
+              RegisterWelcome.fromJson(jsonDecode(response.body));
+          saveStringValue(_registerWelcome!.user.token);
+          saveUsernameValue(name);
+
+          Navigator.pushReplacement(
+              context, MaterialPageRoute(builder: ((context) => LogInPage())));
+          print('Account Created successfully');
         } else {
           String str1 = jsonDecode(response.body).toString();
           String str2 =
@@ -106,7 +123,6 @@ class _SignupPageState extends State<SignupPage> {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      // onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
       child: Scaffold(
           body: Container(
         width: MediaQuery.of(context).size.width,

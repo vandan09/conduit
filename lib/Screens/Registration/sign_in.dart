@@ -15,6 +15,7 @@ import 'package:flutter/src/widgets/framework.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/http.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LogInPage extends StatefulWidget {
   const LogInPage({super.key});
@@ -29,9 +30,41 @@ class _LogInPageState extends State<LogInPage> {
   TextEditingController passwordController = TextEditingController();
   TextEditingController emailController = TextEditingController();
   // Future<Album>? _futureAlbum;
-  Future<RegisterWelcome>? _registerModel;
+  RegisterWelcome? _registerModel;
 
-  String? _userEmail, _password;
+  SharedPreferences? prefs;
+  String? value;
+  String? name;
+  String? emailValue;
+
+  saveStringValue(String token) async {
+    prefs = await SharedPreferences.getInstance();
+    prefs!.setString("token", token);
+  }
+
+  saveEmailValue(String email) async {
+    prefs = await SharedPreferences.getInstance();
+    prefs!.setString("email", email);
+  }
+
+  retrieveStringValue() async {
+    prefs = await SharedPreferences.getInstance();
+    value = prefs!.getString("token");
+    print('token value $value');
+  }
+
+  retrieveUsernameValue() async {
+    prefs = await SharedPreferences.getInstance();
+    name = prefs!.getString("username");
+    print('user name $name');
+  }
+
+  retrieveemailValue() async {
+    prefs = await SharedPreferences.getInstance();
+    emailValue = prefs!.getString("email");
+    print('user name $emailValue');
+  }
+
   void doLoggedin(String email, String password) async {
     if (_formkey.currentState!.validate()) {
       showDialog(
@@ -62,10 +95,12 @@ class _LogInPageState extends State<LogInPage> {
               "content-type": "application/json"
             });
         if (response.statusCode == 200) {
+          RegisterWelcome.fromJson(jsonDecode(response.body));
+          retrieveStringValue();
+          retrieveUsernameValue();
+          saveEmailValue(email);
           Navigator.pushReplacement(
               context, MaterialPageRoute(builder: ((context) => HomeScreen())));
-          // print('Account Created successfully');
-          RegisterWelcome.fromJson(jsonDecode(response.body));
         } else {
           String str1 = jsonDecode(response.body).toString();
           String str2 =
@@ -132,7 +167,7 @@ class _LogInPageState extends State<LogInPage> {
                           margin: EdgeInsets.fromLTRB(30, 80, 30, 0),
                           child: TextFormField(
                             autofocus: false,
-                            onSaved: (value) => _userEmail = value,
+                            // onSaved: (value) => _userEmail = value,
                             validator: validateEmail,
                             keyboardType: TextInputType.emailAddress,
                             textInputAction: TextInputAction.next,
@@ -149,7 +184,7 @@ class _LogInPageState extends State<LogInPage> {
                             autofocus: false,
                             validator: (value) =>
                                 value!.isEmpty ? "Please enter password" : null,
-                            onSaved: (value) => _password = value,
+                            // onSaved: (value) => _password = value,
                             obscureText: true,
                             controller: passwordController,
                             keyboardType: TextInputType.visiblePassword,

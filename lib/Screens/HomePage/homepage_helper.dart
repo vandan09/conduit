@@ -15,37 +15,14 @@ class HomePageHelper extends StatelessWidget {
   TabController? _tabController;
 
   Widget carouselWidget(BuildContext context) {
-    return Container(
-        width: MediaQuery.of(context).size.width,
-        child: CarouselSlider(
-          options: CarouselOptions(
-              autoPlay: true, autoPlayAnimationDuration: Duration(seconds: 1)),
-          items: imgList.map((item) => Image.asset(item, width: 1500)).toList(),
-        ));
-  }
-
-  Widget tabBarWidget() {
-    return TabBar(
-
-        // overlayColor: Colors.orange,
-        labelColor: constantColors.greenColor,
-        unselectedLabelColor: constantColors.greyColor,
-        indicatorColor: Colors.green,
-        controller: _tabController,
-        tabs: const <Widget>[
-          Tab(
-            child: Text(
-              'Your Feed',
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
-          ),
-          Tab(
-            child: Text(
-              'Global Feed',
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
-          ),
-        ]);
+    return CarouselSlider(
+      options: CarouselOptions(
+          viewportFraction: 1,
+          aspectRatio: 16 / 9,
+          autoPlay: true,
+          autoPlayAnimationDuration: Duration(seconds: 1)),
+      items: imgList.map((item) => Image.asset(item, width: 1500)).toList(),
+    );
   }
 
   @override

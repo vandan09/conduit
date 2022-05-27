@@ -1,12 +1,11 @@
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:carousel_slider/carousel_slider.dart';
+
 import 'package:first_app/Screens/Drawer/drawer.dart';
 
 import 'package:first_app/Screens/HomePage/homepage_helper.dart';
 import 'package:first_app/Screens/others/client_profile.dart';
 import 'package:first_app/Screens/others/readmore_page.dart';
 import 'package:first_app/Screens/others/tag_screen.dart';
-import 'package:first_app/Widget/ChangeThemeButtonWidget.dart';
 
 import 'package:first_app/Widget/buttomAppBar.dart';
 
@@ -85,34 +84,35 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
   Widget yourFeed() {
     final orientation = MediaQuery.of(context).orientation;
-    return FutureBuilder<Welcome>(
-        future: _articleModel,
-        builder: (context, snapshot) {
-          if (snapshot.hasData) {
-            return GridView.builder(
-              itemCount: snapshot.data!.articles.length,
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount:
-                      (orientation == Orientation.portrait) ? 2 : 4),
-              itemBuilder: (BuildContext context, int index) {
-                var article = snapshot.data!.articles[index];
-                String authorName = article.author.username;
-                List tag = article.tagList;
-                return Padding(
-                  padding: const EdgeInsets.only(left: 2, top: 2),
-                  child: Card(
-                      elevation: 5,
-                      shadowColor: Colors.black,
-                      child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            // CachedNetworkImage(),
-                            ListTile(
-                              // like button
-                              trailing: GestureDetector(
-                                onTap: () {
-                                  setState(() {
+    return Padding(
+      padding: const EdgeInsets.only(top: 15.0),
+      child: FutureBuilder<Welcome>(
+          future: _articleModel,
+          builder: (context, snapshot) {
+            if (snapshot.connectionState != ConnectionState.waiting) {
+              return GridView.builder(
+                itemCount: snapshot.data!.articles.length,
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount:
+                        (orientation == Orientation.portrait) ? 2 : 4),
+                itemBuilder: (BuildContext context, int index) {
+                  var article = snapshot.data!.articles[index];
+                  String authorName = article.author.username;
+                  List tag = article.tagList;
+                  return Padding(
+                    padding: const EdgeInsets.only(left: 2, top: 2),
+                    child: Card(
+                        elevation: 5,
+                        shadowColor: Colors.black,
+                        child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              // CachedNetworkImage(),
+                              ListTile(
+                                // like button
+                                trailing: GestureDetector(
+                                  onTap: () {
                                     setState(() {
                                       if (article.favorited == false) {
                                         article.favorited = true;
@@ -121,231 +121,234 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                       }
                                     });
                                     article.favorited = true;
-                                  });
-                                },
-                                onLongPress: () {
-                                  setState(() {
-                                    if (article.favorited == true) {
-                                      article.favorited = false;
-                                      len = article.favorited ? len! : len! - 1;
-                                    }
-                                  });
-                                },
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                      color: article.favorited == true
-                                          ? constantColors.greenColor
-                                          : constantColors.whiteColor,
-                                      // _checkColor(index);
-                                      border: Border.all(
-                                          color: constantColors.greenColor),
-                                      borderRadius:
-                                          BorderRadius.all(Radius.circular(5))),
-                                  // alignment: AlignmentDirectional.center,
-                                  // alignment: Alignment.topRight,
-                                  height: 20,
-                                  width: 20,
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Icon(
-                                        Icons.favorite,
+                                  },
+                                  onLongPress: () {
+                                    setState(() {
+                                      if (article.favorited == true) {
+                                        article.favorited = false;
+                                        len =
+                                            article.favorited ? len! : len! - 1;
+                                      }
+                                    });
+                                  },
+                                  child: Container(
+                                    decoration: BoxDecoration(
                                         color: article.favorited == true
-                                            ? constantColors.whiteColor
-                                            : constantColors.greenColor,
-                                        size: 10,
-                                      ),
-                                      // SizedBox(
-                                      //   width: 2,
-                                      // ),
-                                      // Text(
-                                      //   '${article.favoritesCount}',
-                                      //   style: TextStyle(
-                                      //       color: article.favorited == true
-                                      //           ? constantColors.whiteColor
-                                      //           : constantColors.greenColor,
-                                      //       fontSize: 16),
-                                      // )
-                                    ],
-                                  ),
-                                ),
-                              ),
-                              //author image
-                              leading: CachedNetworkImage(
-                                width: 35,
-                                height: 40,
-                                imageBuilder: (context, imageProvider) =>
-                                    Container(
-                                  // width: 15.0,
-                                  // height: 30.0,
-                                  decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    image: DecorationImage(
-                                        image: imageProvider,
-                                        fit: BoxFit.cover),
-                                  ),
-                                ),
-                                progressIndicatorBuilder:
-                                    (context, url, progress) => Center(
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 1,
-                                    color: constantColors.greenColor,
-                                    value: progress.progress,
-                                  ),
-                                ),
-                                imageUrl: article.author.image,
-                              ),
-
-                              //author name
-
-                              title: GestureDetector(
-                                onTap: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) =>
-                                            ClientProfilePapge(authorName,
-                                                article.author.image)),
-                                  );
-                                },
-                                child: Text(
-                                  authorName,
-                                  style: TextStyle(
-                                      color: constantColors.greenColor,
-                                      fontSize: 14),
-                                ),
-                              ),
-                              //date
-                              subtitle: Text(
-                                '${article.createdAt.month}/${article.createdAt.day}/${article.createdAt.year}',
-                                style: TextStyle(
-                                    color: constantColors.greyColor,
-                                    fontSize: 10),
-                              ),
-                            ),
-                            Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 10),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  //title
-                                  GestureDetector(
-                                      onTap: () {
-                                        Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                                builder: (context) =>
-                                                    ReadMorePage(
-                                                        article.title,
-                                                        authorName,
-                                                        article.description,
-                                                        article.createdAt,
-                                                        article.author.image)));
-                                      },
-                                      child: Text(
-                                        article.title,
-                                        style: TextStyle(
-                                            color: constantColors.darkColor,
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 14),
-                                      )),
-                                  SizedBox(
-                                    height: 5,
-                                  ),
-                                  //descripton
-                                  chechDesc(
-                                      article.description,
-                                      article.title,
-                                      article.author.username,
-                                      article.createdAt,
-                                      article.author.image),
-
-                                  //articles tags
-
-                                  Padding(
-                                    padding: const EdgeInsets.only(top: 8.0),
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
+                                            ? constantColors.greenColor
+                                            : constantColors.whiteColor,
+                                        // _checkColor(index);
+                                        border: Border.all(
+                                            color: constantColors.greenColor),
+                                        borderRadius: BorderRadius.all(
+                                            Radius.circular(5))),
+                                    // alignment: AlignmentDirectional.center,
+                                    // alignment: Alignment.topRight,
+                                    height: 20,
+                                    width: 20,
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
                                       children: [
-                                        Container(
-                                          height: 50,
-                                          width: 100,
-                                          // padding: EdgeInsets.all(3),
-                                          child: ListView.builder(
-                                            scrollDirection: Axis.vertical,
-                                            physics:
-                                                NeverScrollableScrollPhysics(),
-                                            shrinkWrap: true,
-                                            itemCount: tag.length,
-                                            itemBuilder: ((context, index) {
-                                              return Column(
-                                                children: [
-                                                  Padding(
-                                                    padding:
-                                                        const EdgeInsets.only(
-                                                            top: 3.0),
-                                                    child: GestureDetector(
-                                                      onTap: () {
-                                                        Navigator.push(
-                                                            context,
-                                                            MaterialPageRoute(
-                                                                builder:
-                                                                    (context) =>
-                                                                        TagScreen(
-                                                                          '${tag[index]}',
-                                                                        )));
-                                                      },
-                                                      child: Container(
-                                                          // width: 90,
-                                                          decoration:
-                                                              BoxDecoration(
-                                                                  border: Border
-                                                                      .all(
-                                                                    color: Colors
-                                                                        .grey
-                                                                        .shade400,
-                                                                  ),
-                                                                  borderRadius:
-                                                                      BorderRadius
-                                                                          .circular(
-                                                                              30)),
-                                                          child: Center(
-                                                              child: Text(
-                                                            tag[index],
-                                                            style: TextStyle(
-                                                                color: Colors
-                                                                    .grey
-                                                                    .shade400,
-                                                                fontSize: 10),
-                                                          ))),
-                                                    ),
-                                                  ),
-                                                ],
-                                              );
-                                            }),
-                                          ),
+                                        Icon(
+                                          Icons.favorite,
+                                          color: article.favorited == true
+                                              ? constantColors.whiteColor
+                                              : constantColors.greenColor,
+                                          size: 10,
                                         ),
+                                        // SizedBox(
+                                        //   width: 2,
+                                        // ),
+                                        // Text(
+                                        //   '${article.favoritesCount}',
+                                        //   style: TextStyle(
+                                        //       color: article.favorited == true
+                                        //           ? constantColors.whiteColor
+                                        //           : constantColors.greenColor,
+                                        //       fontSize: 16),
+                                        // )
                                       ],
                                     ),
                                   ),
-                                ],
+                                ),
+                                //author image
+                                leading: CachedNetworkImage(
+                                  width: 35,
+                                  height: 40,
+                                  imageBuilder: (context, imageProvider) =>
+                                      Container(
+                                    // width: 15.0,
+                                    // height: 30.0,
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      image: DecorationImage(
+                                          image: imageProvider,
+                                          fit: BoxFit.cover),
+                                    ),
+                                  ),
+                                  progressIndicatorBuilder:
+                                      (context, url, progress) => Center(
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 1,
+                                      color: constantColors.greenColor,
+                                      value: progress.progress,
+                                    ),
+                                  ),
+                                  imageUrl: article.author.image,
+                                ),
+
+                                //author name
+
+                                title: GestureDetector(
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) =>
+                                              ClientProfilePapge(authorName,
+                                                  article.author.image)),
+                                    );
+                                  },
+                                  child: Text(
+                                    authorName,
+                                    style: TextStyle(
+                                        color: constantColors.greenColor,
+                                        fontSize: 14),
+                                  ),
+                                ),
+                                //date
+                                subtitle: Text(
+                                  '${article.createdAt.month}/${article.createdAt.day}/${article.createdAt.year}',
+                                  style: TextStyle(
+                                      color: constantColors.greyColor,
+                                      fontSize: 10),
+                                ),
                               ),
-                            ),
-                          ])),
-                );
-              },
-            );
-          } else {
-            return Padding(
-              padding: const EdgeInsets.all(20.0),
-              child: Center(
-                  child: CircularProgressIndicator(
-                      color: constantColors.greenColor)),
-            );
-          }
-        });
+                              Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 10),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    //title
+                                    GestureDetector(
+                                        onTap: () {
+                                          Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      ReadMorePage(
+                                                          article.title,
+                                                          authorName,
+                                                          article.description,
+                                                          article.createdAt,
+                                                          article
+                                                              .author.image)));
+                                        },
+                                        child: Text(
+                                          article.title,
+                                          style: TextStyle(
+                                              color: constantColors.darkColor,
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 14),
+                                        )),
+                                    SizedBox(
+                                      height: 5,
+                                    ),
+                                    //descripton
+                                    chechDesc(
+                                        article.description,
+                                        article.title,
+                                        article.author.username,
+                                        article.createdAt,
+                                        article.author.image),
+
+                                    //articles tags
+
+                                    Padding(
+                                      padding: const EdgeInsets.only(top: 8.0),
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Container(
+                                            height: 50,
+                                            width: 100,
+                                            // padding: EdgeInsets.all(3),
+                                            child: ListView.builder(
+                                              scrollDirection: Axis.vertical,
+                                              physics:
+                                                  NeverScrollableScrollPhysics(),
+                                              shrinkWrap: true,
+                                              itemCount: tag.length,
+                                              itemBuilder: ((context, index) {
+                                                return Column(
+                                                  children: [
+                                                    Padding(
+                                                      padding:
+                                                          const EdgeInsets.only(
+                                                              top: 3.0),
+                                                      child: GestureDetector(
+                                                        onTap: () {
+                                                          Navigator.push(
+                                                              context,
+                                                              MaterialPageRoute(
+                                                                  builder:
+                                                                      (context) =>
+                                                                          TagScreen(
+                                                                            '${tag[index]}',
+                                                                          )));
+                                                        },
+                                                        child: Container(
+                                                            // width: 90,
+                                                            decoration:
+                                                                BoxDecoration(
+                                                                    border:
+                                                                        Border
+                                                                            .all(
+                                                                      color: Colors
+                                                                          .grey
+                                                                          .shade400,
+                                                                    ),
+                                                                    borderRadius:
+                                                                        BorderRadius.circular(
+                                                                            30)),
+                                                            child: Center(
+                                                                child: Text(
+                                                              tag[index],
+                                                              style: TextStyle(
+                                                                  color: Colors
+                                                                      .grey
+                                                                      .shade400,
+                                                                  fontSize: 10),
+                                                            ))),
+                                                      ),
+                                                    ),
+                                                  ],
+                                                );
+                                              }),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ])),
+                  );
+                },
+              );
+            } else {
+              return Padding(
+                padding: const EdgeInsets.all(10.0),
+                child: Center(
+                    child: CircularProgressIndicator(
+                        color: constantColors.greenColor)),
+              );
+            }
+          }),
+    );
   }
 
   Widget customerListView() {
@@ -722,37 +725,62 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               color: constantColors.whiteColor, fontWeight: FontWeight.bold),
         ),
         actions: [
-          Center(
-            child: buildCustomeBadge(
-              len!,
-              child: Icon(
-                Icons.favorite,
-                color: constantColors.whiteColor,
-                size: 30,
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Center(
+              child: buildCustomeBadge(
+                len!,
+                child: Icon(
+                  Icons.favorite,
+                  color: constantColors.whiteColor,
+                  size: 30,
+                ),
               ),
             ),
           ),
-          ChangeThemeButtonWidget(),
+          // ChangeThemeButtonWidget(),
         ],
       ),
       drawer: DrawerWidget(),
       body: SingleChildScrollView(
+          physics: ClampingScrollPhysics(),
           child: Column(
-        children: [
-          //top container //carouseal
+            children: [
+              //top container //carouseal
 
-          HomePageHelper().carouselWidget(context),
+              HomePageHelper().carouselWidget(context),
+              TabBar(
 
-          Container(
-            height: MediaQuery.of(context).size.height * 1.2,
-            width: MediaQuery.of(context).size.width,
-            child: TabBarView(controller: _tabController, children: <Widget>[
-              yourFeed(),
-              customerListView(),
-            ]),
-          ),
-        ],
-      )),
+                  // overlayColor: Colors.orange,
+                  labelColor: constantColors.greenColor,
+                  unselectedLabelColor: constantColors.greyColor,
+                  indicatorColor: Colors.green,
+                  controller: _tabController,
+                  tabs: const <Widget>[
+                    Tab(
+                      child: Text(
+                        'Your Feed',
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                    Tab(
+                      child: Text(
+                        'Global Feed',
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                  ]),
+              Container(
+                height: MediaQuery.of(context).size.height * 1.2,
+                width: MediaQuery.of(context).size.width,
+                child:
+                    TabBarView(controller: _tabController, children: <Widget>[
+                  yourFeed(),
+                  customerListView(),
+                ]),
+              ),
+            ],
+          )),
       bottomNavigationBar: BottomAppBarPage(),
     );
   }

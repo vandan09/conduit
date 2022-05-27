@@ -23,7 +23,7 @@ class Mytheme {
   );
 
   static final lightTheme = ThemeData(
-    appBarTheme: const AppBarTheme(
+    appBarTheme: AppBarTheme(
       systemOverlayStyle: SystemUiOverlayStyle.light,
     ),
     fontFamily: 'TitilliumWeb',

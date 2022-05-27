@@ -345,7 +345,7 @@ class _ClientProfilePapgeState extends State<ClientProfilePapge>
             author,
             overflow: TextOverflow.visible,
             style: TextStyle(
-                color: constantColors.greenColor, fontWeight: FontWeight.bold),
+                color: constantColors.whiteColor, fontWeight: FontWeight.bold),
           ),
         ),
       ),

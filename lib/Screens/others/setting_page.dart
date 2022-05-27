@@ -1,4 +1,7 @@
+import 'dart:convert';
+
 import 'package:another_flushbar/flushbar.dart';
+import 'package:first_app/Screens/Drawer/drawer.dart';
 // import 'package:first_app/Screens/Drawer/Home.dart';
 import 'package:first_app/Screens/HomePage/home.dart';
 // import 'package:first_app/Screens/Drawer/Home.dart';
@@ -7,7 +10,11 @@ import 'package:first_app/Widget/customRaisedButton.dart';
 import 'package:first_app/Screens/Registration/sign_in.dart';
 
 import 'package:first_app/constants/Constantcolors.dart';
+import 'package:first_app/constants/constant_strings.dart';
+import 'package:first_app/model/user_model.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:http/http.dart' as http;
 
 class SettingPage extends StatefulWidget {
   const SettingPage({super.key});
@@ -30,6 +37,96 @@ class _SettingPageState extends State<SettingPage> {
     return _msg;
   }
 
+  String? token;
+  SharedPreferences? prefs;
+  String? emailValue;
+
+  retrieveStringValue() async {
+    prefs = await SharedPreferences.getInstance();
+    setState(() {
+      token = prefs!.getString("token");
+    });
+    print('token value $token');
+  }
+
+  retrieveemailValue() async {
+    prefs = await SharedPreferences.getInstance();
+    emailValue = prefs!.getString("email");
+    print('user name $emailValue');
+  }
+
+  void doPulishArticle(String title, String about, String desc, tag) async {
+    if (_formkey.currentState!.validate()) {
+      showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              backgroundColor: constantColors.transperant,
+              actions: [
+                Center(
+                    child: CircularProgressIndicator(
+                  color: constantColors.greenColor,
+                ))
+              ],
+            );
+          });
+      retrieveStringValue();
+      retrieveemailValue();
+      _formkey.currentState!.save();
+
+      print('valid');
+
+      var userBody = <String, dynamic>{
+        "user": {"email": emailValue}
+      };
+
+      try {
+        http.Response response = await http.put(Uri.parse(Strings.setting_url),
+            body: json.encode(userBody),
+            // encoding: Encoding.getByName("application/x-www-form-urlencoded"),
+            headers: <String, String>{
+              "Accept": "application/json",
+              "content-type": "application/json",
+              'Authorization': "Token ${token!}",
+            });
+        if (response.statusCode == 200) {
+          print('Article published');
+          RegisterWelcome.fromJson(jsonDecode(response.body));
+
+          Navigator.pushReplacement(
+              context, MaterialPageRoute(builder: ((context) => HomeScreen())));
+          Flushbar(
+            title: 'Article Publish',
+            message: ' ',
+            duration: Duration(seconds: 3),
+          ).show(context);
+        } else {
+          String str1 = jsonDecode(response.body).toString();
+          String str2 =
+              str1.replaceAll(new RegExp(r"\p{P}", unicode: true), "");
+          // String error = str2.substring(7);
+          Navigator.pop(context);
+
+          Flushbar(
+            title: 'Invalid form',
+            message: '${str2}',
+            duration: Duration(seconds: 3),
+          ).show(context);
+        }
+      } catch (e) {
+        Navigator.pop(context);
+
+        print(e);
+      }
+    } else {
+      Flushbar(
+        title: 'Invalid form',
+        message: 'Please complete the form properly',
+        duration: Duration(seconds: 2),
+      ).show(context);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -45,6 +142,7 @@ class _SettingPageState extends State<SettingPage> {
           ),
         ),
       ),
+      drawer: DrawerWidget(),
       body: Container(
         width: MediaQuery.of(context).size.width,
         height: MediaQuery.of(context).size.height,
@@ -56,6 +154,10 @@ class _SettingPageState extends State<SettingPage> {
               Container(
                   margin: EdgeInsets.fromLTRB(30, 50, 30, 0),
                   child: TextFormField(
+                    onTap: () {
+                      retrieveemailValue();
+                      retrieveStringValue();
+                    },
                     autofocus: false,
                     validator: CustomeValidaor,
                     keyboardType: TextInputType.text,
@@ -157,6 +259,20 @@ class _SettingPageState extends State<SettingPage> {
                 padding: const EdgeInsets.symmetric(vertical: 20),
                 child: GestureDetector(
                     onTap: () {
+                      showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return AlertDialog(
+                              backgroundColor: constantColors.transperant,
+                              actions: [
+                                Center(
+                                    child: CircularProgressIndicator(
+                                  color: constantColors.greenColor,
+                                ))
+                              ],
+                            );
+                          });
+                      Navigator.pop(context);
                       Navigator.pushReplacement(
                           context,
                           new MaterialPageRoute(

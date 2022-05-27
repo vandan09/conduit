@@ -1,4 +1,5 @@
 // import 'package:first_app/Screens/Drawer/setting_page.dart';
+import 'package:first_app/Screens/Drawer/drawer.dart';
 import 'package:first_app/Screens/others/setting_page.dart';
 import 'package:first_app/Widget/buttomAppBar.dart';
 // import 'package:first_app/Screens/Drawer/setting_page.dart'';
@@ -10,14 +11,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/framework.dart';
 
 class ProfilePage extends StatefulWidget {
-  const ProfilePage({super.key});
-
+  String? name;
+  ProfilePage(this.name);
   @override
-  State<ProfilePage> createState() => _ProfilePageState();
+  State<ProfilePage> createState() => _ProfilePageState(this.name);
 }
 
 class _ProfilePageState extends State<ProfilePage>
     with TickerProviderStateMixin {
+  String? name;
+  _ProfilePageState(this.name);
+
   ConstantColors constantColors = ConstantColors();
   // Future<Album>? _futureAlbum;
   Future<RegisterWelcome>? _registerWelcome;
@@ -58,6 +62,7 @@ class _ProfilePageState extends State<ProfilePage>
           ),
         ),
       ),
+      drawer: DrawerWidget(),
       body: SingleChildScrollView(
           child: Column(
         children: [
@@ -80,13 +85,19 @@ class _ProfilePageState extends State<ProfilePage>
                         size: MediaQuery.of(context).size.height * 0.09,
                         color: Colors.grey.shade700,
                       ),
-                      Text(
-                        // snapshot.data!.user.username,
-                        "Vandan",
-                        style: TextStyle(
-                            fontSize: MediaQuery.of(context).size.height * 0.03,
-                            color: constantColors.greyColor,
-                            fontWeight: FontWeight.bold),
+                      GestureDetector(
+                        onTap: () {
+                          retrieveUsernameValue();
+                        },
+                        child: Text(
+                          // snapshot.data!.user.username,
+                          '${name}',
+                          style: TextStyle(
+                              fontSize:
+                                  MediaQuery.of(context).size.height * 0.03,
+                              color: constantColors.greyColor,
+                              fontWeight: FontWeight.bold),
+                        ),
                       ),
                       SizedBox(
                         height: MediaQuery.of(context).size.height * 0.02,
