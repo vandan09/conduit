@@ -47,6 +47,11 @@ class _LogInPageState extends State<LogInPage> {
     prefs!.setString("email", email);
   }
 
+  saveNameValue(String name) async {
+    prefs = await SharedPreferences.getInstance();
+    prefs!.setString("username", name);
+  }
+
   retrieveStringValue() async {
     prefs = await SharedPreferences.getInstance();
     value = prefs!.getString("token");
@@ -98,18 +103,18 @@ class _LogInPageState extends State<LogInPage> {
           RegisterWelcome.fromJson(jsonDecode(response.body));
           retrieveStringValue();
           retrieveUsernameValue();
-          saveEmailValue(email);
+          // saveEmailValue(email);
+
           Navigator.pushReplacement(
-              context, MaterialPageRoute(builder: ((context) => HomeScreen())));
+              context,
+              MaterialPageRoute(
+                  builder: ((context) => HomeScreen(value!, name!))));
         } else {
           String str1 = jsonDecode(response.body).toString();
           String str2 =
               str1.replaceAll(new RegExp(r"\p{P}", unicode: true), "");
           String error = str2.substring(7);
           Navigator.pop(context);
-          // Navigator.pop(context);
-          // ignore: use_build_context_synchronously
-
           Flushbar(
             title: 'Invalid form',
             message: '${error}',
@@ -195,18 +200,24 @@ class _LogInPageState extends State<LogInPage> {
                       //login button
                       Padding(
                         padding: const EdgeInsets.all(40),
-                        child: GestureDetector(
-                            onTap: () {
-                              setState(() {
-                                doLoggedin(emailController.text,
-                                    passwordController.text);
-                              });
+                        child: WillPopScope(
+                          onWillPop: () async {
+                            // Navigator.pop(context);
+                            return false;
+                          },
+                          child: GestureDetector(
+                              onTap: () {
+                                setState(() {
+                                  doLoggedin(emailController.text,
+                                      passwordController.text);
+                                });
 
-                              // FocusScope.of(context).unfocus();
-                            },
-                            child: CustomRaisedButton(
-                              buttonText: 'Sign in',
-                            )),
+                                // FocusScope.of(context).unfocus();
+                              },
+                              child: CustomRaisedButton(
+                                buttonText: 'Sign in',
+                              )),
+                        ),
                       ),
                     ],
                   ),

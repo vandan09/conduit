@@ -1,36 +1,193 @@
+import 'dart:convert';
+
+import 'package:another_flushbar/flushbar.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 
 import 'package:first_app/Screens/Drawer/drawer.dart';
 
 import 'package:first_app/Screens/HomePage/homepage_helper.dart';
 import 'package:first_app/Screens/others/client_profile.dart';
+import 'package:first_app/Screens/others/liked_articles.dart';
 import 'package:first_app/Screens/others/readmore_page.dart';
 import 'package:first_app/Screens/others/tag_screen.dart';
 
 import 'package:first_app/Widget/buttomAppBar.dart';
 
 import 'package:first_app/constants/Constantcolors.dart';
+import 'package:first_app/constants/constant_strings.dart';
+import 'package:first_app/model/all_article_model.dart';
 
 import 'package:first_app/model/article_model.dart';
+import 'package:first_app/model/delete_fav.dart';
+import 'package:first_app/model/get_liked_modul.dart';
+import 'package:first_app/model/liked_article_model.dart';
+import 'package:first_app/model/new_article_model.dart';
+import 'package:first_app/model/user_model.dart';
 import 'package:first_app/services/api.dart';
 import 'package:flutter/material.dart';
 import 'package:readmore/readmore.dart';
+import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
+
 // import 'package:cached_network_image/cached_network_image.dart';
 
 class HomeScreen extends StatefulWidget {
-  HomeScreen({super.key});
+  String? token, name;
+  HomeScreen(this.token, this.name);
+
+  String? newname;
+  retrieveUsernameValue() async {
+    prefs = await SharedPreferences.getInstance();
+    newname = prefs!.getString("username");
+    print('user name $newname');
+  }
+
+  String? newtoken;
+
+  retrieveStringValue() async {
+    prefs = await SharedPreferences.getInstance();
+
+    newtoken = prefs!.getString("token");
+
+    print('token value $newtoken');
+  }
 
   @override
-  State<HomeScreen> createState() => _HomeScreenState();
+  State<HomeScreen> createState() => _HomeScreenState(this.token, this.name);
 }
 
 class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   ConstantColors constantColors = ConstantColors();
+  String? token, name;
+  _HomeScreenState(this.token, this.name);
 
-  Future<Welcome>? _articleModel;
+  Future<AllArticlle>? _articleModel;
+  Future<GetLikedArticlle>? _AllarticleModel;
+
+  void doLikedArticle(String slug) async {
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            backgroundColor: constantColors.transperant,
+            actions: [
+              Center(
+                  child: CircularProgressIndicator(
+                color: constantColors.greenColor,
+              ))
+            ],
+          );
+        });
+
+    print('valid');
+    retrieveStringValue();
+
+    String finalUrl =
+        "${Strings.favorited_url1}/$slug/${Strings.favorited_url2}";
+    try {
+      http.Response response = await http.post(Uri.parse(finalUrl),
+          // body: json.encode(userBody),
+          // encoding: Encoding.getByName("application/x-www-form-urlencoded"),
+          headers: <String, String>{
+            "Accept": "application/json",
+            "content-type": "application/json",
+            'Authorization': "Token ${token}",
+          });
+      if (response.statusCode == 200) {
+        print('slug value at hime $slug');
+        print('username value at hime $name');
+
+        print('Article liked');
+        LikedArticlle.fromJson(jsonDecode(response.body));
+        Navigator.pop(context);
+
+        Flushbar(
+          title: 'Article liked',
+          message: ' ',
+          duration: Duration(seconds: 3),
+        ).show(context);
+      } else {
+        String str1 = jsonDecode(response.body).toString();
+        String str2 = str1.replaceAll(new RegExp(r"\p{P}", unicode: true), "");
+        // String error = str2.substring(7);
+        Navigator.pop(context);
+
+        Flushbar(
+          title: 'Invalid',
+          message: '${str2}',
+          duration: Duration(seconds: 3),
+        ).show(context);
+      }
+    } catch (e) {
+      Navigator.pop(context);
+
+      print(e);
+    }
+  }
+
+  void doDissLikedArticle(String slug) async {
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            backgroundColor: constantColors.transperant,
+            actions: [
+              Center(
+                  child: CircularProgressIndicator(
+                color: constantColors.greenColor,
+              ))
+            ],
+          );
+        });
+
+    print('valid');
+    retrieveStringValue();
+
+    String deleteUrl =
+        "${Strings.deleteFav_url1}/$slug/${Strings.deleteFav_url2}";
+    try {
+      http.Response response = await http.delete(Uri.parse(deleteUrl),
+          // body: json.encode(userBody),
+          // encoding: Encoding.getByName("application/x-www-form-urlencoded"),
+          headers: <String, String>{
+            "Accept": "application/json",
+            "content-type": "application/json",
+            'Authorization': "Token ${token}",
+          });
+      if (response.statusCode == 200) {
+        // print('Article Disliked');
+        DeleteFav.fromJson(jsonDecode(response.body));
+        Navigator.pop(context);
+
+        Flushbar(
+          title: 'Article Disliked',
+          message: ' ',
+          duration: Duration(seconds: 3),
+        ).show(context);
+      } else {
+        String str1 = jsonDecode(response.body).toString();
+        String str2 = str1.replaceAll(new RegExp(r"\p{P}", unicode: true), "");
+        // String error = str2.substring(7);
+        Navigator.pop(context);
+
+        Flushbar(
+          title: 'Invalid',
+          message: '${str2}',
+          duration: Duration(seconds: 3),
+        ).show(context);
+      }
+    } catch (e) {
+      Navigator.pop(context);
+
+      print(e);
+    }
+  }
+
   @override
   void initState() {
-    _articleModel = API_Manager().getArtciles();
+    _articleModel = API_Manager().getAllArtciles(token!);
+    _AllarticleModel = API_Manager().getLikedArticles(token!, name!);
+
     _tabController = new TabController(length: 2, vsync: this);
 
     super.initState();
@@ -41,13 +198,13 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   int? len = 0;
   final check = List.generate(10, (index) => index * 2);
   final tagName = [
-    'welcome',
+    'AllArticlle',
     'implementations',
     'introduction',
     'codebaseShow'
   ];
 
-  chechDesc(String desc, title, name, DateTime date, String image) {
+  chechDesc(String desc) {
     if (desc.length > 20) {
       String s1 = desc.substring(0, 49);
 
@@ -62,23 +219,35 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 overflow: TextOverflow.ellipsis,
               ),
             ),
-            GestureDetector(
-              onTap: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: ((context) =>
-                            ReadMorePage(title, name, desc, date, image))));
-              },
-              child: Text(
-                'see more',
-                style:
-                    TextStyle(fontSize: 12, color: constantColors.greenColor),
-              ),
-            )
+            // GestureDetector(
+            //   onTap: () {
+            //     Navigator.push(
+            //         context,
+            //         MaterialPageRoute(
+            //             builder: ((context) =>
+            //                 ReadMorePage(title, name, desc, date, image))));
+            //   },
+            //   child: Text(
+            //     'see more',
+            //     style:
+            //         TextStyle(fontSize: 12, color: constantColors.greenColor),
+            //   ),
+            // )
           ],
         ),
       );
+    } else {
+      return Container(
+          width: 250,
+          child: Row(children: [
+            Flexible(
+              child: Text(
+                desc,
+                style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+          ]));
     }
   }
 
@@ -86,7 +255,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     final orientation = MediaQuery.of(context).orientation;
     return Padding(
       padding: const EdgeInsets.only(top: 15.0),
-      child: FutureBuilder<Welcome>(
+      child: FutureBuilder<AllArticlle>(
           future: _articleModel,
           builder: (context, snapshot) {
             if (snapshot.connectionState != ConnectionState.waiting) {
@@ -156,17 +325,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                               : constantColors.greenColor,
                                           size: 10,
                                         ),
-                                        // SizedBox(
-                                        //   width: 2,
-                                        // ),
-                                        // Text(
-                                        //   '${article.favoritesCount}',
-                                        //   style: TextStyle(
-                                        //       color: article.favorited == true
-                                        //           ? constantColors.whiteColor
-                                        //           : constantColors.greenColor,
-                                        //       fontSize: 16),
-                                        // )
                                       ],
                                     ),
                                   ),
@@ -255,13 +413,24 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                     SizedBox(
                                       height: 5,
                                     ),
-                                    //descripton
-                                    chechDesc(
+                                    // descripton
+                                    GestureDetector(
+                                      onTap: () {
+                                        Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (context) =>
+                                                    ReadMorePage(
+                                                        article.title,
+                                                        authorName,
+                                                        article.description,
+                                                        article.createdAt,
+                                                        article.author.image)));
+                                      },
+                                      child: chechDesc(
                                         article.description,
-                                        article.title,
-                                        article.author.username,
-                                        article.createdAt,
-                                        article.author.image),
+                                      ),
+                                    ),
 
                                     //articles tags
 
@@ -355,7 +524,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     return SingleChildScrollView(
       child: Column(
         children: [
-          FutureBuilder<Welcome>(
+          FutureBuilder<AllArticlle>(
             future: _articleModel,
             builder: (context, snapshot) {
               if (snapshot.hasData) {
@@ -381,24 +550,14 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                     // like button
                                     trailing: GestureDetector(
                                       onTap: () {
-                                        setState(() {
-                                          if (article.favorited == false) {
-                                            article.favorited = true;
-                                            len = article.favorited
-                                                ? len! + 1
-                                                : len;
-                                          }
-                                        });
+                                        if (article.favorited == false) {
+                                          doLikedArticle(article.slug);
+                                        }
                                       },
                                       onLongPress: () {
-                                        setState(() {
-                                          if (article.favorited == true) {
-                                            article.favorited = false;
-                                            len = article.favorited
-                                                ? len!
-                                                : len! - 1;
-                                          }
-                                        });
+                                        if (article.favorited == true) {
+                                          doDissLikedArticle(article.slug);
+                                        }
                                       },
                                       child: Container(
                                         decoration: BoxDecoration(
@@ -711,10 +870,98 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     );
   }
 
+  Widget badegWidget() {
+    return Container(
+      height: 30,
+      width: 35,
+      child: FutureBuilder<GetLikedArticlle>(
+        future: _AllarticleModel,
+        builder: (context, snapshot) {
+          if (snapshot.hasData) {
+            return ListView.builder(
+              physics: NeverScrollableScrollPhysics(),
+              shrinkWrap: true,
+              itemCount: 1,
+              itemBuilder: ((context, index) {
+                return buildCustomeBadge(
+                  snapshot.data!.articles.length,
+                  child: Icon(
+                    Icons.favorite,
+                    color: constantColors.whiteColor,
+                    size: 30,
+                  ),
+                );
+              }),
+            );
+          } else {
+            return buildCustomeBadge(
+              0,
+              child: Icon(
+                Icons.favorite,
+                color: constantColors.whiteColor,
+                size: 30,
+              ),
+            );
+          }
+        },
+      ),
+    );
+  }
+
   TabController? _tabController;
+
+  void getAllArticle(String email, String password) async {
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            backgroundColor: constantColors.transperant,
+            actions: [
+              Center(
+                  child: CircularProgressIndicator(
+                color: constantColors.greenColor,
+              ))
+            ],
+          );
+        });
+    retrieveStringValue();
+
+    print('valid');
+
+    try {
+      http.Response response = await http.get(Uri.parse(Strings.article_url),
+
+          // encoding: Encoding.getByName("application/x-www-form-urlencoded"),
+          headers: <String, String>{
+            "Accept": "application/json",
+            "content-type": "application/json",
+            'Authorization': "Token ${token}",
+          });
+      if (response.statusCode == 200) {
+        RegisterWelcome.fromJson(jsonDecode(response.body));
+        // retrieveStringValue();
+      } else {
+        String str1 = jsonDecode(response.body).toString();
+        String str2 = str1.replaceAll(new RegExp(r"\p{P}", unicode: true), "");
+        String error = str2.substring(7);
+
+        Flushbar(
+          title: 'Invalid form',
+          message: '${error}',
+          duration: Duration(seconds: 3),
+        ).show(context);
+      }
+    } catch (e) {
+      Navigator.pop(context);
+
+      print(e);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
+    // Future<GetLikedArticlle>? _articleModel;
+
     return Scaffold(
       appBar: AppBar(
         iconTheme: IconThemeData(color: constantColors.whiteColor),
@@ -728,17 +975,27 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: Center(
-              child: buildCustomeBadge(
-                len!,
-                child: Icon(
-                  Icons.favorite,
-                  color: constantColors.whiteColor,
-                  size: 30,
-                ),
+              child: GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) =>
+                              LikedArticle('$token', '$name')));
+                },
+                // child: buildCustomeBadge(
+                //   len!,
+                //   child: Icon(
+                //     Icons.favorite,
+                //     color: constantColors.whiteColor,
+                //     size: 30,
+                //   ),
+                // ),
+                child: badegWidget(),
               ),
             ),
-          ),
-          // ChangeThemeButtonWidget(),
+            // ChangeThemeButtonWidget(),
+          )
         ],
       ),
       drawer: DrawerWidget(),

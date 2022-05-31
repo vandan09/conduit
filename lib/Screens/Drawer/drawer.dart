@@ -30,6 +30,16 @@ retrieveUsernameValue() async {
   print('user name $name');
 }
 
+String? token;
+
+retrieveStringValue() async {
+  prefs = await SharedPreferences.getInstance();
+
+  token = prefs!.getString("token");
+
+  print('token value $token');
+}
+
 class _DrawerWidgetState extends State<DrawerWidget> {
   @override
   Widget build(BuildContext context) {
@@ -87,8 +97,12 @@ class _DrawerWidgetState extends State<DrawerWidget> {
                 setState(() {
                   selectDrawer = 'home';
                 });
-                Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => HomeScreen()));
+                retrieveStringValue();
+                retrieveUsernameValue();
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => HomeScreen(token, name)));
               },
             ),
           ),
@@ -164,6 +178,7 @@ class _DrawerWidgetState extends State<DrawerWidget> {
                 setState(() {
                   selectDrawer = 'setting';
                 });
+
                 Navigator.push(context,
                     MaterialPageRoute(builder: (context) => SettingPage()));
               },

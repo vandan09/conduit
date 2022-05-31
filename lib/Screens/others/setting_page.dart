@@ -94,7 +94,9 @@ class _SettingPageState extends State<SettingPage> {
           RegisterWelcome.fromJson(jsonDecode(response.body));
 
           Navigator.pushReplacement(
-              context, MaterialPageRoute(builder: ((context) => HomeScreen())));
+              context,
+              MaterialPageRoute(
+                  builder: ((context) => HomeScreen(token!, name!))));
           Flushbar(
             title: 'Article Publish',
             message: ' ',
@@ -226,7 +228,8 @@ class _SettingPageState extends State<SettingPage> {
                         Navigator.pushReplacement(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => HomeScreen()));
+                                builder: (context) =>
+                                    HomeScreen(token!, name!)));
                         print('Entered');
                         Flushbar(
                           title: 'Setting updated',
@@ -257,38 +260,29 @@ class _SettingPageState extends State<SettingPage> {
               //logout
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 20),
-                child: GestureDetector(
-                    onTap: () {
-                      showDialog(
-                          context: context,
-                          builder: (BuildContext context) {
-                            return AlertDialog(
-                              backgroundColor: constantColors.transperant,
-                              actions: [
-                                Center(
-                                    child: CircularProgressIndicator(
-                                  color: constantColors.greenColor,
-                                ))
-                              ],
-                            );
-                          });
-                      Navigator.pop(context);
-                      Navigator.pushReplacement(
-                          context,
-                          new MaterialPageRoute(
-                            builder: (BuildContext context) => LogInPage(),
-                          ));
-                    },
-                    child: Container(
-                      padding: EdgeInsets.all(10),
-                      decoration: BoxDecoration(
-                          border: Border.all(color: constantColors.redColor),
-                          borderRadius: BorderRadius.circular(5)),
-                      child: Text(
-                        'Or click here to logout',
-                        style: TextStyle(color: constantColors.redColor),
-                      ),
-                    )),
+                child: WillPopScope(
+                  onWillPop: () async {
+                    return false;
+                  },
+                  child: GestureDetector(
+                      onTap: () {
+                        Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => LogInPage(),
+                            ));
+                      },
+                      child: Container(
+                        padding: EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                            border: Border.all(color: constantColors.redColor),
+                            borderRadius: BorderRadius.circular(5)),
+                        child: Text(
+                          'Or click here to logout',
+                          style: TextStyle(color: constantColors.redColor),
+                        ),
+                      )),
+                ),
               ),
             ],
           )),

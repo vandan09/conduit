@@ -398,7 +398,7 @@ class _ClientProfilePapgeState extends State<ClientProfilePapge>
                         });
                       },
                       child: Container(
-                        width: 170,
+                        width: 200,
                         height: 40,
                         decoration: BoxDecoration(
                             border: Border.all(color: Colors.grey.shade500),
@@ -407,10 +407,10 @@ class _ClientProfilePapgeState extends State<ClientProfilePapge>
                           mainAxisAlignment: MainAxisAlignment.center,
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
-                            Icon(
-                              follow == true ? null : Icons.add,
-                              color: Colors.grey.shade500,
-                            ),
+                            Icon(follow == true ? null : Icons.add,
+                                color: Colors.grey.shade500,
+                                size:
+                                    MediaQuery.of(context).size.width * 0.035),
                             SizedBox(
                               width: (follow == true ? 0 : 10),
                             ),
@@ -419,11 +419,19 @@ class _ClientProfilePapgeState extends State<ClientProfilePapge>
                               children: [
                                 Text(
                                   follow == true ? "Unfollow" : "Follow",
-                                  style: TextStyle(color: Colors.grey.shade500),
+                                  style: TextStyle(
+                                      color: Colors.grey.shade500,
+                                      fontSize:
+                                          MediaQuery.of(context).size.width *
+                                              0.035),
                                 ),
                                 Text(
                                   ' $author',
-                                  style: TextStyle(color: Colors.grey.shade500),
+                                  style: TextStyle(
+                                      color: Colors.grey.shade500,
+                                      fontSize:
+                                          MediaQuery.of(context).size.width *
+                                              0.035),
                                 ),
                               ],
                             ),

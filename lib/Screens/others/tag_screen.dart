@@ -30,7 +30,7 @@ class _TagScreenState extends State<TagScreen> {
 
   @override
   void initState() {
-    _articleModel = API_Manager().getArtciles();
+    // _articleModel = API_Manager().getArtciles();
     // _tabController = new TabController(length: 2, vsync: this);
 
     super.initState();

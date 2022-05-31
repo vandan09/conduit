@@ -117,7 +117,7 @@ class _ReadMorePageState extends State<ReadMorePage> {
                         });
                       },
                       child: Container(
-                        width: 170,
+                        width: 200,
                         height: 40,
                         decoration: BoxDecoration(
                             border: Border.all(color: Colors.grey.shade500),
@@ -125,10 +125,10 @@ class _ReadMorePageState extends State<ReadMorePage> {
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Icon(
-                              follow == true ? null : Icons.add,
-                              color: Colors.grey.shade500,
-                            ),
+                            Icon(follow == true ? null : Icons.add,
+                                color: Colors.grey.shade500,
+                                size:
+                                    MediaQuery.of(context).size.width * 0.035),
                             SizedBox(
                               width: (follow == true ? 0 : 10),
                             ),
@@ -136,11 +136,19 @@ class _ReadMorePageState extends State<ReadMorePage> {
                               children: [
                                 Text(
                                   follow == true ? "Unfollow" : "Follow",
-                                  style: TextStyle(color: Colors.grey.shade500),
+                                  style: TextStyle(
+                                      color: Colors.grey.shade500,
+                                      fontSize:
+                                          MediaQuery.of(context).size.width *
+                                              0.035),
                                 ),
                                 Text(
                                   ' $author',
-                                  style: TextStyle(color: Colors.grey.shade500),
+                                  style: TextStyle(
+                                      color: Colors.grey.shade500,
+                                      fontSize:
+                                          MediaQuery.of(context).size.width *
+                                              0.035),
                                 ),
                               ],
                             ),
@@ -151,6 +159,7 @@ class _ReadMorePageState extends State<ReadMorePage> {
               ],
             ),
           ),
+          // dec
           Padding(
             padding: const EdgeInsets.only(
                 top: 20.0, right: 20, left: 20, bottom: 20),

@@ -90,7 +90,9 @@ class _NewArticlePageState extends State<NewArticlePage> {
           CreateArticle.fromJson(jsonDecode(response.body));
 
           Navigator.pushReplacement(
-              context, MaterialPageRoute(builder: ((context) => HomeScreen())));
+              context,
+              MaterialPageRoute(
+                  builder: ((context) => HomeScreen(token!, name!))));
           Flushbar(
             title: 'Article Publish',
             message: ' ',
