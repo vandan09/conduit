@@ -3,7 +3,9 @@ import 'dart:convert';
 import 'package:another_flushbar/flushbar.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:first_app/Screens/Drawer/drawer.dart';
+import 'package:first_app/Screens/HomePage/homepage_helper.dart';
 import 'package:first_app/Screens/others/client_profile.dart';
+import 'package:first_app/Screens/others/profile.dart';
 import 'package:first_app/Screens/others/readmore_page.dart';
 import 'package:first_app/Screens/others/tag_screen.dart';
 import 'package:first_app/constants/Constantcolors.dart';
@@ -50,70 +52,8 @@ class _LikedArticleState extends State<LikedArticle> {
     'codebaseShow'
   ];
 
-  void doLikedArticle(String slug) async {
-    showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            backgroundColor: constantColors.transperant,
-            actions: [
-              Center(
-                  child: CircularProgressIndicator(
-                color: constantColors.greenColor,
-              ))
-            ],
-          );
-        });
-
-    print('valid');
-    retrieveStringValue();
-
-    String finalUrl =
-        "${Strings.favorited_url1}/$slug/${Strings.favorited_url2}";
-    try {
-      http.Response response = await http.post(Uri.parse(finalUrl),
-          // body: json.encode(userBody),
-          // encoding: Encoding.getByName("application/x-www-form-urlencoded"),
-          headers: <String, String>{
-            "Accept": "application/json",
-            "content-type": "application/json",
-            'Authorization': "Token ${token}",
-          });
-      if (response.statusCode == 200) {
-        print(slug);
-        print('Article liked');
-        LikedArticlle.fromJson(jsonDecode(response.body));
-        Navigator.pop(context);
-
-        Flushbar(
-          title: 'Article liked',
-          message: ' ',
-          duration: Duration(seconds: 3),
-        ).show(context);
-      } else {
-        String str1 = jsonDecode(response.body).toString();
-        String str2 = str1.replaceAll(new RegExp(r"\p{P}", unicode: true), "");
-        // String error = str2.substring(7);
-        Navigator.pop(context);
-
-        Flushbar(
-          title: 'Invalid form',
-          message: '${str2}',
-          duration: Duration(seconds: 3),
-        ).show(context);
-      }
-    } catch (e) {
-      Navigator.pop(context);
-
-      print(e);
-    }
-  }
-
   @override
   void initState() {
-    // retrieveUsernameValue();
-    print('token 3 value at hime $likedToken');
-    print('username 3 value at hime $LikedName');
     _articleModel = API_Manager().getLikedArticles(likedToken!, LikedName!);
     // _tabController = new TabController(length: 2, vsync: this);
 
@@ -150,26 +90,22 @@ class _LikedArticleState extends State<LikedArticle> {
                                     // like button
                                     trailing: GestureDetector(
                                       onTap: () {
-                                        doLikedArticle(article.slug);
-
-                                        setState(() {
-                                          if (article.favorited == false) {
-                                            article.favorited = true;
-                                            len = article.favorited
-                                                ? len! + 1
-                                                : len;
-                                          }
-                                        });
+                                        if (article.favorited == false) {
+                                          HomePageHelper().doLikedArticle(
+                                              likedToken!,
+                                              article.author.username,
+                                              article.slug,
+                                              context);
+                                        }
                                       },
                                       onLongPress: () {
-                                        setState(() {
-                                          if (article.favorited == true) {
-                                            article.favorited = false;
-                                            len = article.favorited
-                                                ? len!
-                                                : len! - 1;
-                                          }
-                                        });
+                                        if (article.favorited == true) {
+                                          HomePageHelper().doDissLikedArticle(
+                                              likedToken!,
+                                              article.author.username,
+                                              article.slug,
+                                              context);
+                                        }
                                       },
                                       child: Container(
                                         decoration: BoxDecoration(
@@ -245,13 +181,25 @@ class _LikedArticleState extends State<LikedArticle> {
 
                                     title: GestureDetector(
                                       onTap: () {
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                              builder: (context) =>
-                                                  ClientProfilePapge(authorName,
-                                                      article.author.image)),
-                                        );
+                                        if (LikedName ==
+                                            article.author.username) {
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (context) =>
+                                                    ProfilePage(authorName,
+                                                        likedToken)),
+                                          );
+                                        } else {
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (context) =>
+                                                    ClientProfilePapge(
+                                                        authorName,
+                                                        article.author.image)),
+                                          );
+                                        }
                                       },
                                       child: Text(
                                         authorName,
@@ -339,11 +287,10 @@ class _LikedArticleState extends State<LikedArticle> {
                                                       Navigator.push(
                                                           context,
                                                           MaterialPageRoute(
-                                                              builder:
-                                                                  (context) =>
-                                                                      TagScreen(
-                                                                        '${tag[index]}',
-                                                                      )));
+                                                              builder: (context) =>
+                                                                  TagScreen(
+                                                                      '${tag[index]}',
+                                                                      likedToken!)));
                                                     },
                                                     child: Padding(
                                                       padding:

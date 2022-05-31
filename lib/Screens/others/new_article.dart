@@ -47,6 +47,16 @@ class _NewArticlePageState extends State<NewArticlePage> {
     print('token value $token');
   }
 
+  String? name;
+  retrieveUsernameValue() async {
+    prefs = await SharedPreferences.getInstance();
+    setState(() {
+      name = prefs!.getString("username");
+    });
+
+    print('user name $name');
+  }
+
   void doPulishArticle(String title, String about, String desc, tag) async {
     if (_formkey.currentState!.validate()) {
       showDialog(
@@ -88,7 +98,8 @@ class _NewArticlePageState extends State<NewArticlePage> {
         if (response.statusCode == 200) {
           print('Article published');
           CreateArticle.fromJson(jsonDecode(response.body));
-
+          retrieveStringValue();
+          retrieveUsernameValue();
           Navigator.pushReplacement(
               context,
               MaterialPageRoute(

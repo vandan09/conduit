@@ -1,5 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:first_app/Screens/HomePage/homepage_helper.dart';
 import 'package:first_app/Screens/others/client_profile.dart';
+import 'package:first_app/Screens/others/profile.dart';
 import 'package:first_app/Screens/others/readmore_page.dart';
 import 'package:first_app/Screens/others/client_profile.dart';
 import 'package:first_app/constants/Constantcolors.dart';
@@ -8,53 +10,37 @@ import 'package:first_app/services/api.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:readmore/readmore.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../Widget/buttomAppBar.dart';
 
 class TagScreen extends StatefulWidget {
   final String tagName;
+  final String token;
+
   // const TagScreen(String s, {super.key});
-  TagScreen(this.tagName);
+  TagScreen(this.tagName, this.token);
 
   @override
-  State<TagScreen> createState() => _TagScreenState(this.tagName);
+  State<TagScreen> createState() => _TagScreenState(this.tagName, this.token);
 }
 
 class _TagScreenState extends State<TagScreen> {
   final String tagName;
+  final String token;
+
   // const TagScreen(String s, {super.key});
-  _TagScreenState(this.tagName);
+  _TagScreenState(this.tagName, this.token);
   ConstantColors constantColors = ConstantColors();
   final check = List.generate(10, (index) => index * 2);
   Future<Welcome>? _articleModel;
 
   @override
   void initState() {
-    // _articleModel = API_Manager().getArtciles();
+    _articleModel = API_Manager().getArtciles();
     // _tabController = new TabController(length: 2, vsync: this);
 
     super.initState();
-  }
-
-  int? selectedIndex;
-  _setIndex(int index) {
-    setState(() {
-      check[index] = 1;
-    });
-  }
-
-  _unSet(int index) {
-    setState(() {
-      check[index] = 0;
-    });
-  }
-
-  bool _checkColor(int index) {
-    if (check[index] == 1) {
-      return true;
-    } else {
-      return false;
-    }
   }
 
   Widget listView() {
@@ -86,14 +72,25 @@ class _TagScreenState extends State<TagScreen> {
                               // like button
                               trailing: GestureDetector(
                                 onTap: () {
-                                  setState(() {
-                                    article.favorited = true;
-                                  });
+                                  // retrieveStringValue();
+                                  if (article.favorited == false) {
+                                    HomePageHelper().doLikedArticle(
+                                        token,
+                                        article.author.username,
+                                        article.slug,
+                                        context);
+                                  }
                                 },
                                 onLongPress: () {
-                                  setState(() {
-                                    article.favorited = false;
-                                  });
+                                  // retrieveStringValue();
+
+                                  if (article.favorited == true) {
+                                    HomePageHelper().doDissLikedArticle(
+                                        token,
+                                        article.author.username,
+                                        article.slug,
+                                        context);
+                                  }
                                 },
                                 child: Container(
                                   decoration: BoxDecoration(

@@ -50,7 +50,7 @@ class _ReadMorePageState extends State<ReadMorePage> {
           child: Column(
         children: [
           Container(
-            height: MediaQuery.of(context).size.height * 0.3,
+            height: MediaQuery.of(context).size.height * 0.2,
             width: MediaQuery.of(context).size.width,
             color: Color(0xff333333),
             // child: Padding(
@@ -60,6 +60,7 @@ class _ReadMorePageState extends State<ReadMorePage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
+                // title
                 Padding(
                   padding: const EdgeInsets.only(left: 20.0),
                   child: Text(
@@ -71,8 +72,9 @@ class _ReadMorePageState extends State<ReadMorePage> {
                   ),
                 ),
                 SizedBox(
-                  height: 40,
+                  height: 0,
                 ),
+                //image name row
                 ListTile(
                   leading: CachedNetworkImage(
                     width: 50,
@@ -107,6 +109,7 @@ class _ReadMorePageState extends State<ReadMorePage> {
                         fontSize: MediaQuery.of(context).size.height * 0.017),
                   ),
                 ),
+                //follow box
                 Padding(
                   padding:
                       const EdgeInsets.symmetric(horizontal: 20, vertical: 0),

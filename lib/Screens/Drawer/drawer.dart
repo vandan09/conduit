@@ -19,28 +19,33 @@ class DrawerWidget extends StatefulWidget {
   State<DrawerWidget> createState() => _DrawerWidgetState();
 }
 
-ConstantColors constantColors = ConstantColors();
 String selectDrawer = 'home';
-SharedPreferences? prefs;
-
-String? name;
-retrieveUsernameValue() async {
-  prefs = await SharedPreferences.getInstance();
-  name = prefs!.getString("username");
-  print('user name $name');
-}
-
-String? token;
-
-retrieveStringValue() async {
-  prefs = await SharedPreferences.getInstance();
-
-  token = prefs!.getString("token");
-
-  print('token value $token');
-}
 
 class _DrawerWidgetState extends State<DrawerWidget> {
+  ConstantColors constantColors = ConstantColors();
+  SharedPreferences? prefs;
+
+  String? name;
+  retrieveUsernameValue() async {
+    prefs = await SharedPreferences.getInstance();
+    setState(() {
+      name = prefs!.getString("username");
+    });
+    print('user name $name');
+  }
+
+  String? token;
+
+  retrieveStringValue() async {
+    prefs = await SharedPreferences.getInstance();
+
+    setState(() {
+      token = prefs!.getString("token");
+    });
+
+    print('token value $token');
+  }
+
   @override
   Widget build(BuildContext context) {
     return Drawer(
@@ -219,9 +224,12 @@ class _DrawerWidgetState extends State<DrawerWidget> {
                   selectDrawer = 'profile';
                 });
                 retrieveUsernameValue();
+                retrieveStringValue();
 
-                await Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => ProfilePage(name)));
+                await Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => ProfilePage(name, token)));
               },
             ),
           ),

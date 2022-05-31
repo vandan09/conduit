@@ -54,14 +54,18 @@ class _LogInPageState extends State<LogInPage> {
 
   retrieveStringValue() async {
     prefs = await SharedPreferences.getInstance();
-    value = prefs!.getString("token");
-    print('token value $value');
+    setState(() {
+      value = prefs!.getString("token");
+    });
+    print('token at sign in value $value');
   }
 
   retrieveUsernameValue() async {
     prefs = await SharedPreferences.getInstance();
-    name = prefs!.getString("username");
-    print('user name $name');
+    setState(() {
+      name = prefs!.getString("username");
+    });
+    print('user name at sign in $name');
   }
 
   retrieveemailValue() async {

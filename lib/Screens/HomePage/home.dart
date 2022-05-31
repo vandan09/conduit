@@ -8,6 +8,7 @@ import 'package:first_app/Screens/Drawer/drawer.dart';
 import 'package:first_app/Screens/HomePage/homepage_helper.dart';
 import 'package:first_app/Screens/others/client_profile.dart';
 import 'package:first_app/Screens/others/liked_articles.dart';
+import 'package:first_app/Screens/others/profile.dart';
 import 'package:first_app/Screens/others/readmore_page.dart';
 import 'package:first_app/Screens/others/tag_screen.dart';
 
@@ -43,6 +44,7 @@ class HomeScreen extends StatefulWidget {
   }
 
   String? newtoken;
+  SharedPreferences? prefs;
 
   retrieveStringValue() async {
     prefs = await SharedPreferences.getInstance();
@@ -63,125 +65,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
   Future<AllArticlle>? _articleModel;
   Future<GetLikedArticlle>? _AllarticleModel;
-
-  void doLikedArticle(String slug) async {
-    showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            backgroundColor: constantColors.transperant,
-            actions: [
-              Center(
-                  child: CircularProgressIndicator(
-                color: constantColors.greenColor,
-              ))
-            ],
-          );
-        });
-
-    print('valid');
-    retrieveStringValue();
-
-    String finalUrl =
-        "${Strings.favorited_url1}/$slug/${Strings.favorited_url2}";
-    try {
-      http.Response response = await http.post(Uri.parse(finalUrl),
-          // body: json.encode(userBody),
-          // encoding: Encoding.getByName("application/x-www-form-urlencoded"),
-          headers: <String, String>{
-            "Accept": "application/json",
-            "content-type": "application/json",
-            'Authorization': "Token ${token}",
-          });
-      if (response.statusCode == 200) {
-        print('slug value at hime $slug');
-        print('username value at hime $name');
-
-        print('Article liked');
-        LikedArticlle.fromJson(jsonDecode(response.body));
-        Navigator.pop(context);
-
-        Flushbar(
-          title: 'Article liked',
-          message: ' ',
-          duration: Duration(seconds: 3),
-        ).show(context);
-      } else {
-        String str1 = jsonDecode(response.body).toString();
-        String str2 = str1.replaceAll(new RegExp(r"\p{P}", unicode: true), "");
-        // String error = str2.substring(7);
-        Navigator.pop(context);
-
-        Flushbar(
-          title: 'Invalid',
-          message: '${str2}',
-          duration: Duration(seconds: 3),
-        ).show(context);
-      }
-    } catch (e) {
-      Navigator.pop(context);
-
-      print(e);
-    }
-  }
-
-  void doDissLikedArticle(String slug) async {
-    showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            backgroundColor: constantColors.transperant,
-            actions: [
-              Center(
-                  child: CircularProgressIndicator(
-                color: constantColors.greenColor,
-              ))
-            ],
-          );
-        });
-
-    print('valid');
-    retrieveStringValue();
-
-    String deleteUrl =
-        "${Strings.deleteFav_url1}/$slug/${Strings.deleteFav_url2}";
-    try {
-      http.Response response = await http.delete(Uri.parse(deleteUrl),
-          // body: json.encode(userBody),
-          // encoding: Encoding.getByName("application/x-www-form-urlencoded"),
-          headers: <String, String>{
-            "Accept": "application/json",
-            "content-type": "application/json",
-            'Authorization': "Token ${token}",
-          });
-      if (response.statusCode == 200) {
-        // print('Article Disliked');
-        DeleteFav.fromJson(jsonDecode(response.body));
-        Navigator.pop(context);
-
-        Flushbar(
-          title: 'Article Disliked',
-          message: ' ',
-          duration: Duration(seconds: 3),
-        ).show(context);
-      } else {
-        String str1 = jsonDecode(response.body).toString();
-        String str2 = str1.replaceAll(new RegExp(r"\p{P}", unicode: true), "");
-        // String error = str2.substring(7);
-        Navigator.pop(context);
-
-        Flushbar(
-          title: 'Invalid',
-          message: '${str2}',
-          duration: Duration(seconds: 3),
-        ).show(context);
-      }
-    } catch (e) {
-      Navigator.pop(context);
-
-      print(e);
-    }
-  }
 
   @override
   void initState() {
@@ -282,23 +165,22 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                 // like button
                                 trailing: GestureDetector(
                                   onTap: () {
-                                    setState(() {
-                                      if (article.favorited == false) {
-                                        article.favorited = true;
-                                        len =
-                                            article.favorited ? len! + 1 : len;
-                                      }
-                                    });
-                                    article.favorited = true;
+                                    if (article.favorited == false) {
+                                      HomePageHelper().doLikedArticle(
+                                          token!,
+                                          article.author.username,
+                                          article.slug,
+                                          context);
+                                    }
                                   },
                                   onLongPress: () {
-                                    setState(() {
-                                      if (article.favorited == true) {
-                                        article.favorited = false;
-                                        len =
-                                            article.favorited ? len! : len! - 1;
-                                      }
-                                    });
+                                    if (article.favorited == true) {
+                                      HomePageHelper().doDissLikedArticle(
+                                          token!,
+                                          article.author.username,
+                                          article.slug,
+                                          context);
+                                    }
                                   },
                                   child: Container(
                                     decoration: BoxDecoration(
@@ -359,13 +241,22 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
                                 title: GestureDetector(
                                   onTap: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) =>
-                                              ClientProfilePapge(authorName,
-                                                  article.author.image)),
-                                    );
+                                    if (name == article.author.username) {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                ProfilePage(authorName, token)),
+                                      );
+                                    } else {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                ClientProfilePapge(authorName,
+                                                    article.author.image)),
+                                      );
+                                    }
                                   },
                                   child: Text(
                                     authorName,
@@ -462,11 +353,10 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                                           Navigator.push(
                                                               context,
                                                               MaterialPageRoute(
-                                                                  builder:
-                                                                      (context) =>
-                                                                          TagScreen(
-                                                                            '${tag[index]}',
-                                                                          )));
+                                                                  builder: (context) =>
+                                                                      TagScreen(
+                                                                          '${tag[index]}',
+                                                                          token!)));
                                                         },
                                                         child: Container(
                                                             // width: 90,
@@ -551,12 +441,20 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                     trailing: GestureDetector(
                                       onTap: () {
                                         if (article.favorited == false) {
-                                          doLikedArticle(article.slug);
+                                          HomePageHelper().doLikedArticle(
+                                              token!,
+                                              article.author.username,
+                                              article.slug,
+                                              context);
                                         }
                                       },
                                       onLongPress: () {
                                         if (article.favorited == true) {
-                                          doDissLikedArticle(article.slug);
+                                          HomePageHelper().doDissLikedArticle(
+                                              token!,
+                                              article.author.username,
+                                              article.slug,
+                                              context);
                                         }
                                       },
                                       child: Container(
@@ -633,13 +531,24 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
                                     title: GestureDetector(
                                       onTap: () {
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                              builder: (context) =>
-                                                  ClientProfilePapge(authorName,
-                                                      article.author.image)),
-                                        );
+                                        if (name == article.author.username) {
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (context) =>
+                                                    ProfilePage(
+                                                        authorName, token)),
+                                          );
+                                        } else {
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (context) =>
+                                                    ClientProfilePapge(
+                                                        authorName,
+                                                        article.author.image)),
+                                          );
+                                        }
                                       },
                                       child: Text(
                                         authorName,
@@ -665,18 +574,22 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                         //title
                                         GestureDetector(
                                             onTap: () {
-                                              Navigator.push(
-                                                  context,
-                                                  MaterialPageRoute(
-                                                      builder: (context) =>
-                                                          ReadMorePage(
-                                                              article.title,
-                                                              authorName,
-                                                              article
-                                                                  .description,
-                                                              article.createdAt,
-                                                              article.author
-                                                                  .image)));
+                                              if (authorName ==
+                                                  article.author.username) {
+                                                Navigator.push(
+                                                    context,
+                                                    MaterialPageRoute(
+                                                        builder: (context) =>
+                                                            ReadMorePage(
+                                                                article.title,
+                                                                authorName,
+                                                                article
+                                                                    .description,
+                                                                article
+                                                                    .createdAt,
+                                                                article.author
+                                                                    .image)));
+                                              }
                                             },
                                             child: Text(
                                               article.title,
@@ -727,11 +640,10 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                                       Navigator.push(
                                                           context,
                                                           MaterialPageRoute(
-                                                              builder:
-                                                                  (context) =>
-                                                                      TagScreen(
-                                                                        '${tag[index]}',
-                                                                      )));
+                                                              builder: (context) =>
+                                                                  TagScreen(
+                                                                      '${tag[index]}',
+                                                                      token!)));
                                                     },
                                                     child: Padding(
                                                       padding:
@@ -843,8 +755,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                   context,
                                   MaterialPageRoute(
                                       builder: (context) => TagScreen(
-                                            '${tagName[index]}',
-                                          )));
+                                          '${tagName[index]}', token!)));
                             },
                             child: Container(
                               margin: const EdgeInsets.fromLTRB(0, 0, 10, 0),
@@ -924,7 +835,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
             ],
           );
         });
-    retrieveStringValue();
+    // retrieveStringValue();
 
     print('valid');
 
@@ -983,14 +894,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                           builder: (context) =>
                               LikedArticle('$token', '$name')));
                 },
-                // child: buildCustomeBadge(
-                //   len!,
-                //   child: Icon(
-                //     Icons.favorite,
-                //     color: constantColors.whiteColor,
-                //     size: 30,
-                //   ),
-                // ),
                 child: badegWidget(),
               ),
             ),

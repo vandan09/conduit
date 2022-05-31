@@ -263,15 +263,7 @@ class _ClientProfilePapgeState extends State<ClientProfilePapge>
                                               MainAxisAlignment.start,
                                           children: [
                                             GestureDetector(
-                                              onTap: () {
-                                                Navigator.push(
-                                                    context,
-                                                    MaterialPageRoute(
-                                                        builder: (context) =>
-                                                            TagScreen(
-                                                              '${tag[index]}',
-                                                            )));
-                                              },
+                                              onTap: () {},
                                               child: Padding(
                                                 padding: const EdgeInsets.only(
                                                     right: 8.0),

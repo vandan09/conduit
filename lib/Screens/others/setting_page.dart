@@ -52,7 +52,15 @@ class _SettingPageState extends State<SettingPage> {
   retrieveemailValue() async {
     prefs = await SharedPreferences.getInstance();
     emailValue = prefs!.getString("email");
-    print('user name $emailValue');
+    print('user email $emailValue');
+  }
+
+  String? name;
+  retrieveUsernameValue() async {
+    prefs = await SharedPreferences.getInstance();
+    setState(() {
+      name = prefs!.getString("username");
+    });
   }
 
   void doPulishArticle(String title, String about, String desc, tag) async {
