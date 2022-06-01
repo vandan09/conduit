@@ -89,7 +89,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
   chechDesc(String desc) {
     if (desc.length > 20) {
-      String s1 = desc.substring(0, 49);
+      String s1 = desc.substring(0, 20);
 
       return Container(
         width: 250,
@@ -97,25 +97,11 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           children: [
             Flexible(
               child: Text(
-                s1,
+                '$s1...',
                 style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
                 overflow: TextOverflow.ellipsis,
               ),
             ),
-            // GestureDetector(
-            //   onTap: () {
-            //     Navigator.push(
-            //         context,
-            //         MaterialPageRoute(
-            //             builder: ((context) =>
-            //                 ReadMorePage(title, name, desc, date, image))));
-            //   },
-            //   child: Text(
-            //     'see more',
-            //     style:
-            //         TextStyle(fontSize: 12, color: constantColors.greenColor),
-            //   ),
-            // )
           ],
         ),
       );
@@ -287,12 +273,10 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                               MaterialPageRoute(
                                                   builder: (context) =>
                                                       ReadMorePage(
+                                                          token!,
+                                                          name!,
                                                           article.title,
-                                                          authorName,
-                                                          article.description,
-                                                          article.createdAt,
-                                                          article
-                                                              .author.image)));
+                                                          article.slug)));
                                         },
                                         child: Text(
                                           article.title,
@@ -312,11 +296,10 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                             MaterialPageRoute(
                                                 builder: (context) =>
                                                     ReadMorePage(
+                                                        token!,
+                                                        name!,
                                                         article.title,
-                                                        authorName,
-                                                        article.description,
-                                                        article.createdAt,
-                                                        article.author.image)));
+                                                        article.slug)));
                                       },
                                       child: chechDesc(
                                         article.description,
@@ -574,22 +557,15 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                         //title
                                         GestureDetector(
                                             onTap: () {
-                                              if (authorName ==
-                                                  article.author.username) {
-                                                Navigator.push(
-                                                    context,
-                                                    MaterialPageRoute(
-                                                        builder: (context) =>
-                                                            ReadMorePage(
-                                                                article.title,
-                                                                authorName,
-                                                                article
-                                                                    .description,
-                                                                article
-                                                                    .createdAt,
-                                                                article.author
-                                                                    .image)));
-                                              }
+                                              Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                      builder: (context) =>
+                                                          ReadMorePage(
+                                                              token!,
+                                                              name!,
+                                                              article.title,
+                                                              article.slug)));
                                             },
                                             child: Text(
                                               article.title,
@@ -903,44 +879,43 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       ),
       drawer: DrawerWidget(),
       body: SingleChildScrollView(
-          physics: ClampingScrollPhysics(),
+          // physics: ClampingScrollPhysics(),
           child: Column(
-            children: [
-              //top container //carouseal
+        children: [
+          //top container //carouseal
 
-              HomePageHelper().carouselWidget(context),
-              TabBar(
+          HomePageHelper().carouselWidget(context),
+          TabBar(
 
-                  // overlayColor: Colors.orange,
-                  labelColor: constantColors.greenColor,
-                  unselectedLabelColor: constantColors.greyColor,
-                  indicatorColor: Colors.green,
-                  controller: _tabController,
-                  tabs: const <Widget>[
-                    Tab(
-                      child: Text(
-                        'Your Feed',
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                    ),
-                    Tab(
-                      child: Text(
-                        'Global Feed',
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                    ),
-                  ]),
-              Container(
-                height: MediaQuery.of(context).size.height * 1.2,
-                width: MediaQuery.of(context).size.width,
-                child:
-                    TabBarView(controller: _tabController, children: <Widget>[
-                  yourFeed(),
-                  customerListView(),
-                ]),
-              ),
-            ],
-          )),
+              // overlayColor: Colors.orange,
+              labelColor: constantColors.greenColor,
+              unselectedLabelColor: constantColors.greyColor,
+              indicatorColor: Colors.green,
+              controller: _tabController,
+              tabs: const <Widget>[
+                Tab(
+                  child: Text(
+                    'Your Feed',
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                ),
+                Tab(
+                  child: Text(
+                    'Global Feed',
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                ),
+              ]),
+          LimitedBox(
+            maxHeight: MediaQuery.of(context).size.height * 1.2,
+            maxWidth: MediaQuery.of(context).size.width,
+            child: TabBarView(controller: _tabController, children: <Widget>[
+              yourFeed(),
+              customerListView(),
+            ]),
+          ),
+        ],
+      )),
       bottomNavigationBar: BottomAppBarPage(),
     );
   }

@@ -4,6 +4,7 @@ import 'package:first_app/Screens/Drawer/drawer.dart';
 import 'package:first_app/constants/constant_strings.dart';
 import 'package:first_app/model/all_article_model.dart';
 import 'package:first_app/model/article_model.dart';
+import 'package:first_app/model/get_comment_model.dart';
 import 'package:first_app/model/get_liked_modul.dart';
 import 'package:first_app/model/user_model.dart';
 
@@ -89,6 +90,33 @@ class API_Manager {
         var jsonMap = json.decode(jsonString);
 
         articleModel = Welcome.fromJson(jsonMap);
+      }
+    } catch (Exception) {
+      return articleModel;
+    }
+    return articleModel;
+  }
+
+  Future<GetCommentModel> getComments(String token, String slug) async {
+    var client = http.Client();
+    var articleModel = null;
+    String commentUrl = "${Strings.comment_url1}/$slug/${Strings.comment_url2}";
+    try {
+      var response = await client.get(
+        Uri.parse(commentUrl),
+        headers: <String, String>{
+          "Accept": "application/json",
+          "content-type": "application/json",
+          'Authorization': "Token ${token}",
+        },
+      );
+
+      if (response.statusCode == 200) {
+        var jsonString = response.body;
+
+        var jsonMap = json.decode(jsonString);
+
+        articleModel = GetCommentModel.fromJson(jsonMap);
       }
     } catch (Exception) {
       return articleModel;

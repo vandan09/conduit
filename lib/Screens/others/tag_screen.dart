@@ -5,6 +5,7 @@ import 'package:first_app/Screens/others/profile.dart';
 import 'package:first_app/Screens/others/readmore_page.dart';
 import 'package:first_app/Screens/others/client_profile.dart';
 import 'package:first_app/constants/Constantcolors.dart';
+import 'package:first_app/model/all_article_model.dart';
 import 'package:first_app/model/article_model.dart';
 import 'package:first_app/services/api.dart';
 import 'package:flutter/material.dart';
@@ -33,11 +34,11 @@ class _TagScreenState extends State<TagScreen> {
   _TagScreenState(this.tagName, this.token);
   ConstantColors constantColors = ConstantColors();
   final check = List.generate(10, (index) => index * 2);
-  Future<Welcome>? _articleModel;
+  Future<AllArticlle>? _articleModel;
 
   @override
   void initState() {
-    _articleModel = API_Manager().getArtciles();
+    _articleModel = API_Manager().getAllArtciles(token);
     // _tabController = new TabController(length: 2, vsync: this);
 
     super.initState();
@@ -46,7 +47,7 @@ class _TagScreenState extends State<TagScreen> {
   Widget listView() {
     return SingleChildScrollView(
         child: Column(children: [
-      FutureBuilder<Welcome>(
+      FutureBuilder<AllArticlle>(
         future: _articleModel,
         builder: (context, snapshot) {
           if (snapshot.hasData) {
@@ -192,16 +193,14 @@ class _TagScreenState extends State<TagScreen> {
                                   //title
                                   GestureDetector(
                                       onTap: () {
-                                        Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                                builder: (context) =>
-                                                    ReadMorePage(
-                                                        article.title,
-                                                        article.author.username,
-                                                        article.description,
-                                                        article.createdAt,
-                                                        article.author.image)));
+                                        // Navigator.push(
+                                        //     context,
+                                        //     MaterialPageRoute(
+                                        //         builder: (context) =>
+                                        //             ReadMorePage(
+                                        //                 token,
+                                        //                 article.author.username,
+                                        //                 article.title)));
                                       },
                                       child: Text(
                                         article.title,

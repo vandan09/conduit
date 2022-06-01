@@ -14,4 +14,10 @@ class Strings {
   static String deleteFav_url2 = "favorite";
   static String likedArticle_url =
       "https://api.realworld.io/api/articles?favorited=";
+
+  static String deleterArticle_url = "https://api.realworld.io/api/articles/";
+
+  static String comment_url1 = "https://api.realworld.io/api/articles";
+  // /{{slug}}/
+  static String comment_url2 = "comments";
 }

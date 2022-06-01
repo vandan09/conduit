@@ -210,25 +210,21 @@ class _ClientProfilePapgeState extends State<ClientProfilePapge>
                                 children: [
                                   //title
                                   GestureDetector(
-                                      onTap: () {
-                                        Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                                builder: (context) =>
-                                                    ReadMorePage(
-                                                        article.title,
-                                                        authorName,
-                                                        article.description,
-                                                        article.createdAt,
-                                                        article.author.image)));
-                                      },
+                                      // onTap: () {
+                                      //   Navigator.push(
+                                      //       context,
+                                      //       MaterialPageRoute(
+                                      //           builder: (context) =>
+                                      //               ReadMorePage(
+                                      //                   )));
+                                      // },
                                       child: Text(
-                                        article.title,
-                                        style: TextStyle(
-                                            color: constantColors.darkColor,
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 18),
-                                      )),
+                                    article.title,
+                                    style: TextStyle(
+                                        color: constantColors.darkColor,
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 18),
+                                  )),
                                   //descripton
                                   GestureDetector(
                                       child: ReadMoreText(

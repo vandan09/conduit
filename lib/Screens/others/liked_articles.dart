@@ -230,13 +230,10 @@ class _LikedArticleState extends State<LikedArticle> {
                                                   MaterialPageRoute(
                                                       builder: (context) =>
                                                           ReadMorePage(
+                                                              likedToken!,
+                                                              LikedName!,
                                                               article.title,
-                                                              authorName,
-                                                              article
-                                                                  .description,
-                                                              article.createdAt,
-                                                              article.author
-                                                                  .image)));
+                                                              article.slug)));
                                             },
                                             child: Text(
                                               article.title,

@@ -225,14 +225,10 @@ class _ProfilePageState extends State<ProfilePage>
                                                     MaterialPageRoute(
                                                         builder: (context) =>
                                                             ReadMorePage(
+                                                                token!,
+                                                                name!,
                                                                 article.title,
-                                                                authorName,
-                                                                article
-                                                                    .description,
-                                                                article
-                                                                    .createdAt,
-                                                                article.author
-                                                                    .image)));
+                                                                article.slug)));
                                               },
                                               child: Text(
                                                 article.title,
@@ -516,13 +512,10 @@ class _ProfilePageState extends State<ProfilePage>
                                                   MaterialPageRoute(
                                                       builder: (context) =>
                                                           ReadMorePage(
+                                                              token!,
+                                                              name!,
                                                               article.title,
-                                                              authorName,
-                                                              article
-                                                                  .description,
-                                                              article.createdAt,
-                                                              article.author
-                                                                  .image)));
+                                                              article.slug)));
                                             },
                                             child: Text(
                                               article.title,
