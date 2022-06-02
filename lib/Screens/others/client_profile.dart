@@ -234,7 +234,7 @@ class _ClientProfilePapgeState extends State<ClientProfilePapge>
                                     trimMode: TrimMode.Line,
                                     trimCollapsedText: 'Read more',
                                     trimExpandedText: ' Show less',
-                                    article.description,
+                                    article.body,
                                     style: TextStyle(
                                         color: constantColors.greyColor,
                                         fontSize: 14),

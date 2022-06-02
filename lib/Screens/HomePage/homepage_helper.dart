@@ -10,6 +10,7 @@ import 'package:first_app/model/comment_model.dart';
 import 'package:first_app/model/delete_article_model.dart';
 import 'package:first_app/model/delete_fav.dart';
 import 'package:first_app/model/liked_article_model.dart';
+import 'package:first_app/model/update_article_model.dart';
 import 'package:http/http.dart' as http;
 
 import 'package:flutter/material.dart';
@@ -221,6 +222,86 @@ class HomePageHelper extends StatelessWidget {
     }
   }
 
+  updateArticle(
+    String slug,
+    String name,
+    String token,
+    GlobalKey<FormState> _formkey,
+    BuildContext context,
+    String desc,
+  ) async {
+    if (_formkey.currentState!.validate()) {
+      showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              backgroundColor: constantColors.transperant,
+              actions: [
+                Center(
+                    child: CircularProgressIndicator(
+                  color: constantColors.greenColor,
+                ))
+              ],
+            );
+          });
+      _formkey.currentState!.save();
+
+      print('valid');
+      // retrieveStringValue();
+
+      var userBody = <String, dynamic>{
+        "article": {"body": desc}
+      };
+      String updateArticle = "${Strings.updateArticle_url}/$slug";
+      try {
+        http.Response response = await http.put(Uri.parse(updateArticle),
+            body: json.encode(userBody),
+            // encoding: Encoding.getByName("application/x-www-form-urlencoded"),
+            headers: <String, String>{
+              "Accept": "application/json",
+              "content-type": "application/json",
+              'Authorization': "Token ${token}",
+            });
+        if (response.statusCode == 200) {
+          print('Article updated');
+          UpdateArticle.fromJson(jsonDecode(response.body));
+
+          Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                  builder: ((context) => HomeScreen(token, name))));
+          Flushbar(
+            title: 'Article updated',
+            message: ' ',
+            duration: Duration(seconds: 3),
+          ).show(context);
+        } else {
+          String str1 = jsonDecode(response.body).toString();
+          String str2 =
+              str1.replaceAll(new RegExp(r"\p{P}", unicode: true), "");
+          // String error = str2.substring(7);
+          Navigator.pop(context);
+
+          Flushbar(
+            title: 'Invalid form',
+            message: '${str2}',
+            duration: Duration(seconds: 3),
+          ).show(context);
+        }
+      } catch (e) {
+        Navigator.pop(context);
+
+        print(e);
+      }
+    } else {
+      Flushbar(
+        title: 'Invalid form',
+        message: 'Please complete the form properly',
+        duration: Duration(seconds: 2),
+      ).show(context);
+    }
+  }
+
   deleteComment(String token, String slug, BuildContext context, String name,
       int id) async {
     showDialog(
@@ -288,7 +369,8 @@ class HomePageHelper extends StatelessWidget {
       String comment,
       String slug,
       String token,
-      TextEditingController commentController) async {
+      TextEditingController commentController,
+      String name) async {
     if (_formkey.currentState!.validate()) {
       showDialog(
           context: context,
@@ -328,6 +410,9 @@ class HomePageHelper extends StatelessWidget {
           CommentModel.fromJson(jsonDecode(response.body));
           commentController.clear();
           Navigator.pop(context);
+          Navigator.pushReplacement(context,
+              MaterialPageRoute(builder: (context) => HomeScreen(token, name)));
+
           Flushbar(
             title: 'Comment Publish',
             message: ' ',

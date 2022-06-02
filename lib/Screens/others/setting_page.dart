@@ -274,11 +274,11 @@ class _SettingPageState extends State<SettingPage> {
                   },
                   child: GestureDetector(
                       onTap: () {
-                        Navigator.pushReplacement(
+                        Navigator.pushAndRemoveUntil(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => LogInPage(),
-                            ));
+                                builder: (context) => LogInPage()),
+                            (Route<dynamic> route) => false);
                       },
                       child: Container(
                         padding: EdgeInsets.all(10),

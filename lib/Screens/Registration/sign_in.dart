@@ -109,10 +109,10 @@ class _LogInPageState extends State<LogInPage> {
           retrieveUsernameValue();
           // saveEmailValue(email);
 
-          Navigator.pushReplacement(
+          Navigator.pushAndRemoveUntil(
               context,
-              MaterialPageRoute(
-                  builder: ((context) => HomeScreen(value!, name!))));
+              MaterialPageRoute(builder: (context) => HomeScreen(value, name)),
+              (Route<dynamic> route) => false);
         } else {
           String str1 = jsonDecode(response.body).toString();
           String str2 =
@@ -204,24 +204,18 @@ class _LogInPageState extends State<LogInPage> {
                       //login button
                       Padding(
                         padding: const EdgeInsets.all(40),
-                        child: WillPopScope(
-                          onWillPop: () async {
-                            // Navigator.pop(context);
-                            return false;
-                          },
-                          child: GestureDetector(
-                              onTap: () {
-                                setState(() {
-                                  doLoggedin(emailController.text,
-                                      passwordController.text);
-                                });
+                        child: GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                doLoggedin(emailController.text,
+                                    passwordController.text);
+                              });
 
-                                // FocusScope.of(context).unfocus();
-                              },
-                              child: CustomRaisedButton(
-                                buttonText: 'Sign in',
-                              )),
-                        ),
+                              // FocusScope.of(context).unfocus();
+                            },
+                            child: CustomRaisedButton(
+                              buttonText: 'Sign in',
+                            )),
                       ),
                     ],
                   ),

@@ -5,6 +5,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:first_app/Screens/HomePage/homepage_helper.dart';
 import 'package:first_app/Screens/others/client_profile.dart';
 import 'package:first_app/Screens/others/profile.dart';
+import 'package:first_app/Screens/others/update_article.dart';
 import 'package:first_app/Widget/buttomAppBar.dart';
 import 'package:first_app/constants/Constantcolors.dart';
 import 'package:first_app/constants/constant_strings.dart';
@@ -118,6 +119,41 @@ class _ReadMorePageState extends State<ReadMorePage> {
                 'Delete Article',
                 style:
                     TextStyle(color: constantColors.redColor.withOpacity(0.8)),
+              )
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget updateArticle(String slug, String name) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 0),
+      child: GestureDetector(
+        onTap: () {
+          Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                  builder: (context) =>
+                      UpdateArticleScreen(authorname, slug, token)));
+        },
+        child: Container(
+          width: 150,
+          height: 40,
+          decoration: BoxDecoration(
+              border: Border.all(color: Colors.grey),
+              borderRadius: BorderRadius.circular(5)),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                Icons.edit,
+                color: Colors.grey,
+              ),
+              Text(
+                'Update Article',
+                style: TextStyle(color: Colors.grey),
               )
             ],
           ),
@@ -243,7 +279,15 @@ class _ReadMorePageState extends State<ReadMorePage> {
                                     //follow box
                                     Container(),
                                     authorname == article.author.username
-                                        ? deleteButton(article.slug, authorname)
+                                        ? Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.start,
+                                            children: [
+                                                deleteButton(
+                                                    article.slug, authorname),
+                                                updateArticle(
+                                                    article.slug, authorname)
+                                              ])
                                         : followButton(article.author.username),
                                   ],
                                 ),
@@ -254,7 +298,7 @@ class _ReadMorePageState extends State<ReadMorePage> {
                                     top: 20.0, right: 20, left: 20, bottom: 20),
                                 child: Container(
                                   child: Text(
-                                    article.description,
+                                    article.body,
                                     style: TextStyle(fontSize: 16),
                                   ),
                                 ),
@@ -322,7 +366,8 @@ class _ReadMorePageState extends State<ReadMorePage> {
                                                               .text,
                                                           article.slug,
                                                           token,
-                                                          commentController);
+                                                          commentController,
+                                                          authorname);
                                                 },
                                                 child: Center(
                                                   child: Text(
@@ -352,10 +397,13 @@ class _ReadMorePageState extends State<ReadMorePage> {
                     );
                   } else {
                     return Center(
-                      child: CircularProgressIndicator(),
+                      child: CircularProgressIndicator(
+                        color: constantColors.greenColor,
+                      ),
                     );
                   }
                 }),
+            //comment list
             FutureBuilder<GetCommentModel>(
                 future: _commentModel,
                 builder: (context, snapshot) {
@@ -363,6 +411,7 @@ class _ReadMorePageState extends State<ReadMorePage> {
                     return ListView.builder(
                       physics: NeverScrollableScrollPhysics(),
                       shrinkWrap: true,
+                      reverse: true,
                       itemCount: snapshot.data!.comments.length,
                       itemBuilder: ((context, index) {
                         var comment = snapshot.data!.comments[index];
@@ -376,7 +425,7 @@ class _ReadMorePageState extends State<ReadMorePage> {
                               children: [
                                 Container(
                                   padding: EdgeInsets.symmetric(
-                                      horizontal: 10, vertical: 10),
+                                      horizontal: 15, vertical: 20),
                                   decoration: BoxDecoration(
                                     color: Colors.grey.shade200,
                                   ),

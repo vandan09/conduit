@@ -78,12 +78,7 @@ class _NewArticlePageState extends State<NewArticlePage> {
       retrieveStringValue();
 
       var userBody = <String, dynamic>{
-        "article": {
-          "title": title,
-          "description": desc,
-          "body": about,
-          "tagList": tag
-        }
+        "article": {"title": title, "body": desc, "body": about, "tagList": tag}
       };
 
       try {

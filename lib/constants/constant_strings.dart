@@ -20,4 +20,5 @@ class Strings {
   static String comment_url1 = "https://api.realworld.io/api/articles";
   // /{{slug}}/
   static String comment_url2 = "comments";
+  static String updateArticle_url = "https://api.realworld.io/api/articles";
 }

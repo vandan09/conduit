@@ -80,12 +80,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
   int? len = 0;
   final check = List.generate(10, (index) => index * 2);
-  final tagName = [
-    'AllArticlle',
-    'implementations',
-    'introduction',
-    'codebaseShow'
-  ];
+  final tagName = ['implementations', 'introduction', 'codebaseShow'];
 
   chechDesc(String desc) {
     if (desc.length > 20) {
@@ -302,7 +297,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                                         article.slug)));
                                       },
                                       child: chechDesc(
-                                        article.description,
+                                        article.body,
                                       ),
                                     ),
 
@@ -584,7 +579,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                           trimMode: TrimMode.Line,
                                           trimCollapsedText: 'Read more',
                                           trimExpandedText: ' Show less',
-                                          article.description,
+                                          article.body,
                                           style: TextStyle(
                                               color: constantColors.greyColor,
                                               fontSize: 14),
