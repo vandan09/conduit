@@ -1,5 +1,6 @@
 import 'package:first_app/Screens/others/new_article.dart';
 import 'package:first_app/Screens/HomePage/home.dart';
+import 'package:first_app/Screens/notifications/notification_screen.dart';
 // import 'package:first_app/Screens/Drawer/new_article.dart';
 // import 'package:first_app/Screens/Drawer/profile.dart';
 // import 'package:first_app/Screens/Drawer/setting_page.dart';
@@ -236,11 +237,11 @@ class _DrawerWidgetState extends State<DrawerWidget> {
           // notification
           Container(
             decoration: BoxDecoration(
-                color: selectDrawer == 'profile'
+                color: selectDrawer == 'notification'
                     ? constantColors.greenColor
                     : constantColors.whiteColor,
                 border: Border.all(
-                  color: selectDrawer == 'profile'
+                  color: selectDrawer == 'notification'
                       ? constantColors.greenColor
                       : constantColors.whiteColor,
                 ),
@@ -249,23 +250,23 @@ class _DrawerWidgetState extends State<DrawerWidget> {
                     bottomRight: Radius.circular(20))),
             child: ListTile(
               leading: Icon(
-                Icons.face,
-                color: selectDrawer == 'profile'
+                Icons.notifications,
+                color: selectDrawer == 'notification'
                     ? constantColors.whiteColor
                     : Colors.grey.shade400,
                 size: 30,
               ),
               title: Text(
-                'Profile',
+                'Notifications',
                 style: TextStyle(
-                    color: selectDrawer == 'profile'
+                    color: selectDrawer == 'notification'
                         ? constantColors.whiteColor
                         : Colors.grey.shade400,
                     fontSize: 17),
               ),
               onTap: () async {
                 setState(() {
-                  selectDrawer = 'profile';
+                  selectDrawer = 'notification';
                 });
                 retrieveUsernameValue();
                 retrieveStringValue();
@@ -273,7 +274,7 @@ class _DrawerWidgetState extends State<DrawerWidget> {
                 await Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (context) => ProfilePage(name, token)));
+                        builder: (context) => NotificationScreen()));
               },
             ),
           ),

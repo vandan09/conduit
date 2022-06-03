@@ -6,6 +6,7 @@ import 'package:first_app/provider/theme.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:overlay_support/overlay_support.dart';
 import 'package:provider/provider.dart';
 
 void main() {
@@ -33,22 +34,25 @@ class _MyAppState extends State<MyApp> {
       builder: (context, _) {
         var themeprovider = Provider.of<ThemeProvider>(context, listen: false);
 
-        return MaterialApp(
-            debugShowCheckedModeBanner: false,
-            themeMode: themeprovider.themeMode,
-            darkTheme: Mytheme.darkTheme,
-            theme:
-                themeprovider.isDarkMode ? ThemeData.dark() : ThemeData.light(),
+        return OverlaySupport(
+          child: MaterialApp(
+              debugShowCheckedModeBanner: false,
+              themeMode: themeprovider.themeMode,
+              darkTheme: Mytheme.darkTheme,
+              theme: themeprovider.isDarkMode
+                  ? ThemeData.dark()
+                  : ThemeData.light(),
 
-            // appBarTheme: AppBarTheme(
-            // color: Color(0xff26872f),
-            // backgroundColor: Color(0xff26872f)
-            //   systemOverlayStyle: SystemUiOverlayStyle.light,
-            // ),
-            // primaryColor: constantColors.whiteColor,
-            //   fontFamily: 'TitilliumWeb',
-            // ),
-            home: SplashScreen());
+              // appBarTheme: AppBarTheme(
+              // color: Color(0xff26872f),
+              // backgroundColor: Color(0xff26872f)
+              //   systemOverlayStyle: SystemUiOverlayStyle.light,
+              // ),
+              // primaryColor: constantColors.whiteColor,
+              //   fontFamily: 'TitilliumWeb',
+              // ),
+              home: SplashScreen()),
+        );
       },
     );
   }

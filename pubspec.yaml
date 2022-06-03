@@ -47,6 +47,9 @@ dependencies:
   super_tooltip: ^1.0.1
   image_picker: ^0.8.5+3
   path_provider: ^2.0.10
+  firebase_core: ^1.17.1
+  overlay_support: ^2.0.1
+  firebase_messaging: ^11.4.1
   
 
 dev_dependencies:
