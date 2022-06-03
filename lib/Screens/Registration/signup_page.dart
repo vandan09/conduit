@@ -12,6 +12,7 @@ import 'package:first_app/model/user_model.dart';
 import 'package:first_app/utils/validation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
+import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -30,6 +31,7 @@ class _SignupPageState extends State<SignupPage> {
   }
 
   Duration get loginTime => Duration(milliseconds: timeDilation.ceil() * 2250);
+  bool visible = false;
   ConstantColors constantColors = ConstantColors();
   TextEditingController usernameController = TextEditingController();
   TextEditingController emailController = TextEditingController();
@@ -122,126 +124,171 @@ class _SignupPageState extends State<SignupPage> {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      child: Scaffold(
-          body: Container(
-        width: MediaQuery.of(context).size.width,
-        height: MediaQuery.of(context).size.height,
-        child: Form(
-          key: _formkey,
-          autovalidateMode: AutovalidateMode.always,
-          child: SingleChildScrollView(
-            child: Stack(
-              children: [
-                //sign in head
-                Center(
-                  child: Container(
-                    margin: EdgeInsets.symmetric(vertical: 150),
-                    child: Text('Sign up',
-                        style: TextStyle(
-                            color: constantColors.darkColor,
-                            fontSize: 30,
-                            fontWeight: FontWeight.bold)),
-                  ),
-                ),
-                //form
-                Container(
-                    // margin: EdgeInsets.only(top: 80),
-                    margin: EdgeInsets.fromLTRB(30, 180, 30, 50),
-                    child: Column(
-                      children: [
-                        // username Text Field
-                        Container(
-                            margin: EdgeInsets.fromLTRB(30, 80, 30, 0),
-                            child: TextFormField(
-                              // onSaved: (value) => _userName = value,
-                              validator: (value) =>
-                                  value!.isEmpty ? "Enter User name" : null,
-                              keyboardType: TextInputType.text,
-                              textInputAction: TextInputAction.next,
-                              controller: usernameController,
-                              decoration: InputDecoration(
-                                  border: OutlineInputBorder(),
-                                  hintText: 'Username'),
-                            )),
-                        //email
-                        Container(
-                            margin: EdgeInsets.fromLTRB(30, 30, 30, 0),
-                            child: TextFormField(
-                              // onSaved: (value) => _userEmail = value,
-                              validator: validateEmail,
-                              keyboardType: TextInputType.emailAddress,
-                              textInputAction: TextInputAction.next,
-                              controller: emailController,
-                              decoration: InputDecoration(
-                                  border: OutlineInputBorder(),
-                                  hintText: 'Email'),
-                            )),
-                        //password
-                        Container(
-                            margin: EdgeInsets.fromLTRB(30, 30, 30, 0),
-                            child: TextFormField(
-                              // onSaved: (value) => _password = value,
-                              validator: (value) =>
-                                  value!.isEmpty ? "Enter Password" : null,
-                              obscureText: true,
-                              keyboardType: TextInputType.visiblePassword,
-                              controller: passwordController,
-                              decoration: InputDecoration(
-                                  border: OutlineInputBorder(),
-                                  hintText: 'Password'),
-                            )),
-                        //login button
-                        Padding(
-                          padding: const EdgeInsets.all(40),
-                          child: GestureDetector(
-                              onTap: () {
-                                // auth.loggedInStatus == Status.Authenticating
-                                // ? CircularProgressIndicator()
-                                setState(() {
-                                  doRegister(
-                                      usernameController.text,
-                                      emailController.text,
-                                      passwordController.text);
-                                });
-                              },
-                              child: CustomRaisedButton(
-                                buttonText: 'Sign up',
-                              )),
-                        ),
-                      ],
-                    )),
-                // SignUp Line
-                Container(
-                  margin: EdgeInsets.fromLTRB(30, 200, 30, 50),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: <Widget>[
-                      GestureDetector(
-                        onTap: () {
-                          Navigator.pushReplacement(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => LogInPage()));
-                        },
-                        child: Container(
-                          child: Text(
-                            'Have an account?',
+    return AutofillGroup(
+      child: GestureDetector(
+        child: Scaffold(
+            body: GestureDetector(
+          onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
+          child: Container(
+            width: MediaQuery.of(context).size.width,
+            height: MediaQuery.of(context).size.height,
+            child: Form(
+              key: _formkey,
+              autovalidateMode: AutovalidateMode.always,
+              child: SingleChildScrollView(
+                child: Stack(
+                  children: [
+                    //sign in head
+                    Center(
+                      child: Container(
+                        margin: EdgeInsets.symmetric(vertical: 150),
+                        child: Text('Sign up',
                             style: TextStyle(
-                              color: constantColors.greenColor,
-                              fontSize: 15,
+                                color: constantColors.darkColor,
+                                fontSize: 30,
+                                fontWeight: FontWeight.bold)),
+                      ),
+                    ),
+                    //form
+                    Container(
+                        // margin: EdgeInsets.only(top: 80),
+                        margin: EdgeInsets.fromLTRB(30, 180, 30, 50),
+                        child: Column(
+                          children: [
+                            // username Text Field
+                            Container(
+                                margin: EdgeInsets.fromLTRB(30, 80, 30, 0),
+                                child: TextFormField(
+                                  autofillHints: [AutofillHints.givenName],
+                                  // onSaved: (value) => _userName = value,
+                                  validator: (value) =>
+                                      value!.isEmpty ? "Enter User name" : null,
+                                  keyboardType: TextInputType.text,
+                                  textInputAction: TextInputAction.next,
+                                  controller: usernameController,
+                                  decoration: InputDecoration(
+                                      focusedBorder: OutlineInputBorder(
+                                          borderRadius: BorderRadius.all(
+                                              Radius.circular(5.0)),
+                                          borderSide: BorderSide(
+                                              width: 2,
+                                              color:
+                                                  constantColors.greenColor)),
+                                      border: OutlineInputBorder(),
+                                      hintText: 'Username'),
+                                )),
+                            //email
+                            Container(
+                                margin: EdgeInsets.fromLTRB(30, 30, 30, 0),
+                                child: TextFormField(
+                                  autofillHints: [AutofillHints.email],
+
+                                  // onSaved: (value) => _userEmail = value,
+                                  validator: validateEmail,
+                                  keyboardType: TextInputType.emailAddress,
+                                  textInputAction: TextInputAction.next,
+                                  controller: emailController,
+                                  decoration: InputDecoration(
+                                      focusedBorder: OutlineInputBorder(
+                                          borderRadius: BorderRadius.all(
+                                              Radius.circular(5.0)),
+                                          borderSide: BorderSide(
+                                              width: 2,
+                                              color:
+                                                  constantColors.greenColor)),
+                                      border: OutlineInputBorder(),
+                                      hintText: 'Email'),
+                                )),
+                            //password
+                            Container(
+                                margin: EdgeInsets.fromLTRB(30, 30, 30, 0),
+                                child: TextFormField(
+                                  autofillHints: [AutofillHints.password],
+                                  onEditingComplete: () =>
+                                      TextInput.finishAutofillContext(),
+
+                                  // onSaved: (value) => _password = value,
+                                  validator: (value) =>
+                                      value!.isEmpty ? "Enter Password" : null,
+                                  obscureText: !visible,
+                                  keyboardType: TextInputType.visiblePassword,
+                                  controller: passwordController,
+                                  decoration: InputDecoration(
+                                      focusedBorder: OutlineInputBorder(
+                                          borderRadius: BorderRadius.all(
+                                              Radius.circular(5.0)),
+                                          borderSide: BorderSide(
+                                              width: 2,
+                                              color:
+                                                  constantColors.greenColor)),
+                                      suffixIcon: GestureDetector(
+                                          onTap: () {
+                                            setState(() {
+                                              visible = !visible;
+                                            });
+                                          },
+                                          child: Icon(
+                                            visible
+                                                ? Icons.visibility
+                                                : Icons.visibility_off,
+                                            color: constantColors.greenColor,
+                                          )),
+                                      border: OutlineInputBorder(),
+                                      hintText: 'Password'),
+                                )),
+                            //login button
+                            Padding(
+                              padding: const EdgeInsets.all(40),
+                              child: GestureDetector(
+                                  onTap: () {
+                                    // auth.loggedInStatus == Status.Authenticating
+                                    // ? CircularProgressIndicator()
+                                    setState(() {
+                                      doRegister(
+                                          usernameController.text,
+                                          emailController.text,
+                                          passwordController.text);
+                                    });
+                                  },
+                                  child: CustomRaisedButton(
+                                    buttonText: 'Sign up',
+                                  )),
+                            ),
+                          ],
+                        )),
+                    // SignUp Line
+                    Container(
+                      margin: EdgeInsets.fromLTRB(30, 200, 30, 50),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[
+                          GestureDetector(
+                            onTap: () {
+                              Navigator.pushReplacement(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => LogInPage()));
+                            },
+                            child: Container(
+                              child: Text(
+                                'Have an account?',
+                                style: TextStyle(
+                                  color: constantColors.greenColor,
+                                  fontSize: 15,
+                                ),
+                              ),
                             ),
                           ),
-                        ),
+                        ],
                       ),
-                    ],
-                  ),
-                )
-              ],
+                    )
+                  ],
+                ),
+              ),
             ),
           ),
-        ),
-      )),
+        )),
+      ),
     );
   }
 

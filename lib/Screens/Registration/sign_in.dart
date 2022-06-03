@@ -9,8 +9,10 @@ import 'package:first_app/constants/constant_strings.dart';
 import 'package:first_app/model/user_model.dart';
 
 import 'package:first_app/services/api.dart';
+import 'package:first_app/services/shared_prefences.dart';
 import 'package:first_app/utils/validation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/http.dart';
@@ -25,6 +27,8 @@ class LogInPage extends StatefulWidget {
 }
 
 class _LogInPageState extends State<LogInPage> {
+  PrefServices _prefServices = PrefServices();
+  bool visible = false;
   ConstantColors constantColors = ConstantColors();
   final GlobalKey<FormState> _formkey = GlobalKey<FormState>();
   TextEditingController passwordController = TextEditingController();
@@ -75,68 +79,71 @@ class _LogInPageState extends State<LogInPage> {
   }
 
   void doLoggedin(String email, String password) async {
-    if (_formkey.currentState!.validate()) {
-      showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              backgroundColor: constantColors.transperant,
-              actions: [
-                Center(
-                    child: CircularProgressIndicator(
-                  color: constantColors.greenColor,
-                ))
-              ],
-            );
-          });
-      _formkey.currentState!.save();
-      print('valid');
-      var userBody = <String, dynamic>{
-        "user": {"email": email, "password": password}
-      };
-
-      try {
-        http.Response response = await http.post(Uri.parse(Strings.login_url),
-            body: json.encode(userBody),
-            // encoding: Encoding.getByName("application/x-www-form-urlencoded"),
-            headers: <String, String>{
-              "Accept": "application/json",
-              "content-type": "application/json"
+    _prefServices.createCache(emailController.text).whenComplete(() async {
+      if (_formkey.currentState!.validate()) {
+        showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                backgroundColor: constantColors.transperant,
+                actions: [
+                  Center(
+                      child: CircularProgressIndicator(
+                    color: constantColors.greenColor,
+                  ))
+                ],
+              );
             });
-        if (response.statusCode == 200) {
-          RegisterWelcome.fromJson(jsonDecode(response.body));
-          retrieveStringValue();
-          retrieveUsernameValue();
-          // saveEmailValue(email);
+        _formkey.currentState!.save();
+        print('valid');
+        var userBody = <String, dynamic>{
+          "user": {"email": email, "password": password}
+        };
 
-          Navigator.pushAndRemoveUntil(
-              context,
-              MaterialPageRoute(builder: (context) => HomeScreen(value, name)),
-              (Route<dynamic> route) => false);
-        } else {
-          String str1 = jsonDecode(response.body).toString();
-          String str2 =
-              str1.replaceAll(new RegExp(r"\p{P}", unicode: true), "");
-          String error = str2.substring(7);
+        try {
+          http.Response response = await http.post(Uri.parse(Strings.login_url),
+              body: json.encode(userBody),
+              // encoding: Encoding.getByName("application/x-www-form-urlencoded"),
+              headers: <String, String>{
+                "Accept": "application/json",
+                "content-type": "application/json"
+              });
+          if (response.statusCode == 200) {
+            RegisterWelcome.fromJson(jsonDecode(response.body));
+            retrieveStringValue();
+            retrieveUsernameValue();
+            // saveEmailValue(email);
+
+            Navigator.pushAndRemoveUntil(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => HomeScreen(value, name)),
+                (Route<dynamic> route) => false);
+          } else {
+            String str1 = jsonDecode(response.body).toString();
+            String str2 =
+                str1.replaceAll(new RegExp(r"\p{P}", unicode: true), "");
+            String error = str2.substring(7);
+            Navigator.pop(context);
+            Flushbar(
+              title: 'Invalid form',
+              message: '${error}',
+              duration: Duration(seconds: 3),
+            ).show(context);
+          }
+        } catch (e) {
           Navigator.pop(context);
-          Flushbar(
-            title: 'Invalid form',
-            message: '${error}',
-            duration: Duration(seconds: 3),
-          ).show(context);
-        }
-      } catch (e) {
-        Navigator.pop(context);
 
-        print(e);
+          print(e);
+        }
+      } else {
+        Flushbar(
+          title: 'Invalid form',
+          message: 'Please complete the form properly',
+          duration: Duration(seconds: 2),
+        ).show(context);
       }
-    } else {
-      Flushbar(
-        title: 'Invalid form',
-        message: 'Please complete the form properly',
-        duration: Duration(seconds: 2),
-      ).show(context);
-    }
+    });
   }
 
   @override
@@ -144,109 +151,142 @@ class _LogInPageState extends State<LogInPage> {
     return GestureDetector(
       // onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
       child: Scaffold(
-          body: Container(
-        width: MediaQuery.of(context).size.width,
-        height: MediaQuery.of(context).size.height,
-        child: Form(
-          autovalidateMode: AutovalidateMode.always,
-          key: _formkey,
-          child: SingleChildScrollView(
-            child: Stack(
-              children: [
-                //sign in head
-                Center(
-                  child: Container(
-                    margin: EdgeInsets.symmetric(vertical: 150),
-                    child: Text('Sign in',
-                        style: TextStyle(
-                            color: constantColors.darkColor,
-                            fontSize: 30,
-                            fontWeight: FontWeight.bold)),
+          body: GestureDetector(
+        onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
+        child: Container(
+          width: MediaQuery.of(context).size.width,
+          height: MediaQuery.of(context).size.height,
+          child: Form(
+            autovalidateMode: AutovalidateMode.always,
+            key: _formkey,
+            child: SingleChildScrollView(
+              child: Stack(
+                children: [
+                  //sign in head
+                  Center(
+                    child: Container(
+                      margin: EdgeInsets.symmetric(vertical: 150),
+                      child: Text('Sign in',
+                          style: TextStyle(
+                              color: constantColors.darkColor,
+                              fontSize: 30,
+                              fontWeight: FontWeight.bold)),
+                    ),
                   ),
-                ),
-                //form
-                Container(
-                  // margin: EdgeInsets.only(top: 80),
-                  margin: EdgeInsets.fromLTRB(30, 180, 30, 50),
+                  //form
+                  Container(
+                    // margin: EdgeInsets.only(top: 80),
+                    margin: EdgeInsets.fromLTRB(30, 180, 30, 50),
 
-                  child: Column(
-                    children: [
-                      // Email Text Field
-                      Container(
-                          margin: EdgeInsets.fromLTRB(30, 80, 30, 0),
-                          child: TextFormField(
-                            autofocus: false,
-                            // onSaved: (value) => _userEmail = value,
-                            validator: validateEmail,
-                            keyboardType: TextInputType.emailAddress,
-                            textInputAction: TextInputAction.next,
-                            controller: emailController,
-                            decoration: InputDecoration(
-                                border: OutlineInputBorder(),
-                                hintText: 'Email'),
-                          )),
-                      //password
-                      Container(
-                          margin: EdgeInsets.fromLTRB(30, 30, 30, 0),
-                          child: TextFormField(
-                            // onTap: FocusScope.of(context).unfocus,
-                            autofocus: false,
-                            validator: (value) =>
-                                value!.isEmpty ? "Please enter password" : null,
-                            // onSaved: (value) => _password = value,
-                            obscureText: true,
-                            controller: passwordController,
-                            keyboardType: TextInputType.visiblePassword,
-                            decoration: InputDecoration(
-                                border: OutlineInputBorder(),
-                                hintText: 'Password'),
-                          )),
-                      //login button
-                      Padding(
-                        padding: const EdgeInsets.all(40),
-                        child: GestureDetector(
-                            onTap: () {
-                              setState(() {
-                                doLoggedin(emailController.text,
-                                    passwordController.text);
-                              });
+                    child: Column(
+                      children: [
+                        // Email Text Field
+                        Container(
+                            margin: EdgeInsets.fromLTRB(30, 80, 30, 0),
+                            child: TextFormField(
+                              autofillHints: [AutofillHints.email],
 
-                              // FocusScope.of(context).unfocus();
-                            },
-                            child: CustomRaisedButton(
-                              buttonText: 'Sign in',
+                              autofocus: false,
+                              // onSaved: (value) => _userEmail = value,
+                              validator: validateEmail,
+                              keyboardType: TextInputType.emailAddress,
+                              textInputAction: TextInputAction.next,
+                              controller: emailController,
+                              decoration: InputDecoration(
+                                  focusedBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.all(
+                                          Radius.circular(5.0)),
+                                      borderSide: BorderSide(
+                                          width: 2,
+                                          color: constantColors.greenColor)),
+                                  border: OutlineInputBorder(),
+                                  hintText: 'Email'),
                             )),
-                      ),
-                    ],
+                        //password
+                        Container(
+                            margin: EdgeInsets.fromLTRB(30, 30, 30, 0),
+                            child: TextFormField(
+                              autofillHints: [AutofillHints.password],
+                              onEditingComplete: () =>
+                                  TextInput.finishAutofillContext(),
+                              // onTap: FocusScope.of(context).unfocus,
+                              autofocus: false,
+                              validator: (value) => value!.isEmpty
+                                  ? "Please enter password"
+                                  : null,
+                              // onSaved: (value) => _password = value,
+                              obscureText: !visible,
+                              controller: passwordController,
+                              keyboardType: TextInputType.visiblePassword,
+                              decoration: InputDecoration(
+                                  focusedBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.all(
+                                          Radius.circular(5.0)),
+                                      borderSide: BorderSide(
+                                          width: 2,
+                                          color: constantColors.greenColor)),
+                                  suffixIcon: GestureDetector(
+                                      onTap: () {
+                                        setState(() {
+                                          visible = !visible;
+                                        });
+                                      },
+                                      child: Icon(
+                                        visible
+                                            ? Icons.visibility
+                                            : Icons.visibility_off,
+                                        color: constantColors.greenColor,
+                                      )),
+                                  border: OutlineInputBorder(),
+                                  hintText: 'Password'),
+                            )),
+                        //login button
+                        Padding(
+                          padding: const EdgeInsets.all(40),
+                          child: GestureDetector(
+                              onTap: () {
+                                setState(() {
+                                  doLoggedin(emailController.text,
+                                      passwordController.text);
+                                });
+
+                                // FocusScope.of(context).unfocus();
+                              },
+                              child: CustomRaisedButton(
+                                buttonText: 'Sign in',
+                              )),
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-                // SignUp Line
-                Container(
-                  margin: EdgeInsets.fromLTRB(30, 200, 30, 50),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: <Widget>[
-                      GestureDetector(
-                        onTap: () {
-                          Navigator.pushReplacement(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => SignupPage()));
-                        },
-                        child: Container(
-                          child: Text(
-                            'Need an account?',
-                            style: TextStyle(
-                              color: constantColors.greenColor,
-                              fontSize: 15,
+                  // SignUp Line
+                  Container(
+                    margin: EdgeInsets.fromLTRB(30, 200, 30, 50),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: <Widget>[
+                        GestureDetector(
+                          onTap: () {
+                            Navigator.pushReplacement(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => SignupPage()));
+                          },
+                          child: Container(
+                            child: Text(
+                              'Need an account?',
+                              style: TextStyle(
+                                color: constantColors.greenColor,
+                                fontSize: 15,
+                              ),
                             ),
                           ),
                         ),
-                      ),
-                    ],
-                  ),
-                )
-              ],
+                      ],
+                    ),
+                  )
+                ],
+              ),
             ),
           ),
         ),

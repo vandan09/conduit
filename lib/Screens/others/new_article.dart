@@ -78,7 +78,12 @@ class _NewArticlePageState extends State<NewArticlePage> {
       retrieveStringValue();
 
       var userBody = <String, dynamic>{
-        "article": {"title": title, "body": desc, "body": about, "tagList": tag}
+        "article": {
+          "title": title,
+          "description": about,
+          "body": desc,
+          "tagList": tag
+        }
       };
 
       try {
@@ -216,36 +221,6 @@ class _NewArticlePageState extends State<NewArticlePage> {
               ),
               Container(
                 margin: EdgeInsets.fromLTRB(30, 0, 30, 0),
-                // child: Tags(
-                //   key: globalKey,
-                //   itemCount: tags.length,
-                //   columns: 6,
-                //   textField: TagsTextField(
-                //       width: 400,
-                //       textStyle: TextStyle(fontSize: 16),
-                //       onSubmitted: (string) {
-                //         setState(() {
-                //           tags.add(Item(title: string));
-                //         });
-                //       }),
-                //   itemBuilder: (index) {
-                //     return ItemTags(
-                //       color: constantColors.greenColor,
-                //       index: index,
-                //       title: tags[index].title,
-                //       customData: tags[index].customData,
-                //       textStyle: TextStyle(fontSize: 14),
-                //       onPressed: (i) => print(i),
-                //       onLongPressed: (i) => print(i),
-                //       removeButton: ItemTagsRemoveButton(onRemoved: () {
-                //         setState(() {
-                //           tags.removeAt(index);
-                //         });
-                //         return true;
-                //       }),
-                //     );
-                //   },
-                // ),
                 child: TextFormField(
                   // onTap: FocusScope.of(context).unfocus,
                   validator: CustomeValidaor,

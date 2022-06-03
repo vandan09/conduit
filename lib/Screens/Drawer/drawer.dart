@@ -233,6 +233,50 @@ class _DrawerWidgetState extends State<DrawerWidget> {
               },
             ),
           ),
+          // notification
+          Container(
+            decoration: BoxDecoration(
+                color: selectDrawer == 'profile'
+                    ? constantColors.greenColor
+                    : constantColors.whiteColor,
+                border: Border.all(
+                  color: selectDrawer == 'profile'
+                      ? constantColors.greenColor
+                      : constantColors.whiteColor,
+                ),
+                borderRadius: BorderRadius.only(
+                    topRight: Radius.circular(20),
+                    bottomRight: Radius.circular(20))),
+            child: ListTile(
+              leading: Icon(
+                Icons.face,
+                color: selectDrawer == 'profile'
+                    ? constantColors.whiteColor
+                    : Colors.grey.shade400,
+                size: 30,
+              ),
+              title: Text(
+                'Profile',
+                style: TextStyle(
+                    color: selectDrawer == 'profile'
+                        ? constantColors.whiteColor
+                        : Colors.grey.shade400,
+                    fontSize: 17),
+              ),
+              onTap: () async {
+                setState(() {
+                  selectDrawer = 'profile';
+                });
+                retrieveUsernameValue();
+                retrieveStringValue();
+
+                await Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => ProfilePage(name, token)));
+              },
+            ),
+          ),
         ],
       ),
     );

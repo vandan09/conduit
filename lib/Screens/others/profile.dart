@@ -48,17 +48,13 @@ class _ProfilePageState extends State<ProfilePage>
 
   ConstantColors constantColors = ConstantColors();
   // Future<GetLikedArticlle>? _AllarticleModel;
-  Future<AllArticlle>? _articleModel;
-  Future<GetLikedArticlle>? _articlelikedeModel;
 
-  // Future<Album>? _futureAlbum;
-  Future<RegisterWelcome>? _registerWelcome;
   Widget MyArticles(BuildContext context) {
     return SingleChildScrollView(
       child: Column(
         children: [
           FutureBuilder<AllArticlle>(
-            future: _articleModel,
+            future: API_Manager().getAllArtciles(token!),
             builder: (context, snapshot) {
               if (snapshot.hasData) {
                 return ListView.builder(
@@ -84,22 +80,27 @@ class _ProfilePageState extends State<ProfilePage>
                                       // like button
                                       trailing: GestureDetector(
                                         onTap: () {
-                                          if (article.favorited == false) {
-                                            HomePageHelper().doLikedArticle(
-                                                token!,
-                                                article.author.username,
-                                                article.slug,
-                                                context);
-                                          }
+                                          setState(() {
+                                            if (article.favorited == false) {
+                                              HomePageHelper().doLikedArticle(
+                                                  token!,
+                                                  article.author.username,
+                                                  article.slug,
+                                                  context);
+                                            }
+                                          });
                                         },
                                         onLongPress: () {
-                                          if (article.favorited == true) {
-                                            HomePageHelper().doDissLikedArticle(
-                                                token!,
-                                                article.author.username,
-                                                article.slug,
-                                                context);
-                                          }
+                                          setState(() {
+                                            if (article.favorited == true) {
+                                              HomePageHelper()
+                                                  .doDissLikedArticle(
+                                                      token!,
+                                                      article.author.username,
+                                                      article.slug,
+                                                      context);
+                                            }
+                                          });
                                         },
                                         child: Container(
                                           decoration: BoxDecoration(
@@ -176,25 +177,28 @@ class _ProfilePageState extends State<ProfilePage>
 
                                       title: GestureDetector(
                                         onTap: () {
-                                          if (name == article.author.username) {
-                                            Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                  builder: (context) =>
-                                                      ProfilePage(
-                                                          authorName, token)),
-                                            );
-                                          } else {
-                                            Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                  builder: (context) =>
-                                                      ClientProfilePapge(
-                                                          authorName,
-                                                          article
-                                                              .author.image)),
-                                            );
-                                          }
+                                          setState(() {
+                                            if (name ==
+                                                article.author.username) {
+                                              Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        ProfilePage(
+                                                            authorName, token)),
+                                              );
+                                            } else {
+                                              Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        ClientProfilePapge(
+                                                            authorName,
+                                                            article
+                                                                .author.image)),
+                                              );
+                                            }
+                                          });
                                         },
                                         child: Text(
                                           authorName,
@@ -220,15 +224,18 @@ class _ProfilePageState extends State<ProfilePage>
                                           //title
                                           GestureDetector(
                                               onTap: () {
-                                                Navigator.push(
-                                                    context,
-                                                    MaterialPageRoute(
-                                                        builder: (context) =>
-                                                            ReadMorePage(
-                                                                token!,
-                                                                name!,
-                                                                article.title,
-                                                                article.slug)));
+                                                setState(() {
+                                                  Navigator.push(
+                                                      context,
+                                                      MaterialPageRoute(
+                                                          builder: (context) =>
+                                                              ReadMorePage(
+                                                                  token!,
+                                                                  name!,
+                                                                  article.title,
+                                                                  article
+                                                                      .slug)));
+                                                });
                                               },
                                               child: Text(
                                                 article.title,
@@ -359,7 +366,7 @@ class _ProfilePageState extends State<ProfilePage>
       child: Column(
         children: [
           FutureBuilder<GetLikedArticlle>(
-            future: _articlelikedeModel,
+            future: API_Manager().getLikedArticles(token!, name!),
             builder: (context, snapshot) {
               if (snapshot.hasData) {
                 return ListView.builder(
@@ -384,22 +391,26 @@ class _ProfilePageState extends State<ProfilePage>
                                     // like button
                                     trailing: GestureDetector(
                                       onTap: () {
-                                        if (article.favorited == false) {
-                                          HomePageHelper().doLikedArticle(
-                                              token!,
-                                              article.author.username,
-                                              article.slug,
-                                              context);
-                                        }
+                                        setState(() {
+                                          if (article.favorited == false) {
+                                            HomePageHelper().doLikedArticle(
+                                                token!,
+                                                article.author.username,
+                                                article.slug,
+                                                context);
+                                          }
+                                        });
                                       },
                                       onLongPress: () {
-                                        if (article.favorited == true) {
-                                          HomePageHelper().doDissLikedArticle(
-                                              token!,
-                                              article.author.username,
-                                              article.slug,
-                                              context);
-                                        }
+                                        setState(() {
+                                          if (article.favorited == true) {
+                                            HomePageHelper().doDissLikedArticle(
+                                                token!,
+                                                article.author.username,
+                                                article.slug,
+                                                context);
+                                          }
+                                        });
                                       },
                                       child: Container(
                                         decoration: BoxDecoration(
@@ -475,13 +486,16 @@ class _ProfilePageState extends State<ProfilePage>
 
                                     title: GestureDetector(
                                       onTap: () {
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                              builder: (context) =>
-                                                  ClientProfilePapge(authorName,
-                                                      article.author.image)),
-                                        );
+                                        setState(() {
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (context) =>
+                                                    ClientProfilePapge(
+                                                        authorName,
+                                                        article.author.image)),
+                                          );
+                                        });
                                       },
                                       child: Text(
                                         authorName,
@@ -507,15 +521,17 @@ class _ProfilePageState extends State<ProfilePage>
                                         //title
                                         GestureDetector(
                                             onTap: () {
-                                              Navigator.push(
-                                                  context,
-                                                  MaterialPageRoute(
-                                                      builder: (context) =>
-                                                          ReadMorePage(
-                                                              token!,
-                                                              name!,
-                                                              article.title,
-                                                              article.slug)));
+                                              setState(() {
+                                                Navigator.push(
+                                                    context,
+                                                    MaterialPageRoute(
+                                                        builder: (context) =>
+                                                            ReadMorePage(
+                                                                token!,
+                                                                name!,
+                                                                article.title,
+                                                                article.slug)));
+                                              });
                                             },
                                             child: Text(
                                               article.title,
@@ -661,9 +677,6 @@ class _ProfilePageState extends State<ProfilePage>
   void initState() {
     super.initState();
 
-    _articleModel = API_Manager().getAllArtciles(token!);
-    _articlelikedeModel = API_Manager().getLikedArticles(token!, name!);
-
     _tabController = TabController(length: 2, vsync: this);
     super.initState();
   }
@@ -706,157 +719,142 @@ class _ProfilePageState extends State<ProfilePage>
       body: SingleChildScrollView(
           child: Column(
         children: [
-          FutureBuilder<RegisterWelcome>(
-            future: _registerWelcome,
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return CircularProgressIndicator();
-              } else {
-                return Container(
-                  height: MediaQuery.of(context).size.height * 0.35,
-                  width: MediaQuery.of(context).size.width,
-                  color: Colors.grey.shade100,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      //image
-                      Stack(
-                        children: [
-                          ClipOval(
-                            child: image != null
-                                ? Image.file(
-                                    image!,
-                                    height: 128,
-                                    width: 128,
-                                    fit: BoxFit.cover,
-                                  )
-                                : Image.asset(
-                                    'assets/images/NoProfile.png',
-                                    height: 128,
-                                    width: 128,
-                                    fit: BoxFit.cover,
-                                  ),
-                          ),
-                          //edit button
-                          Positioned(
-                            bottom: 0,
-                            right: 4,
-                            child: GestureDetector(
-                                onTap: () {
-                                  showDialog(
-                                    context: context,
-                                    builder: (BuildContext context) {
-                                      return AlertDialog(
-                                        title: Center(
-                                            child: Text(
-                                          'Select Image source',
-                                          style: TextStyle(
-                                              fontWeight: FontWeight.bold),
-                                        )),
-                                        actionsPadding: EdgeInsets.all(8),
-                                        actionsAlignment:
-                                            MainAxisAlignment.center,
-                                        actions: [
-                                          MaterialButton(
-                                              color: constantColors.greenColor,
-                                              child: Text(
-                                                "Gallery",
-                                                style: TextStyle(
-                                                    color: constantColors
-                                                        .whiteColor,
-                                                    fontWeight:
-                                                        FontWeight.bold),
-                                              ),
-                                              onPressed: () {
-                                                pickImage(ImageSource.gallery);
-                                                Navigator.pop(context);
-                                              }),
-                                          MaterialButton(
-                                              color: constantColors.greenColor,
-                                              child: Text(
-                                                "Camera",
-                                                style: TextStyle(
-                                                    color: constantColors
-                                                        .whiteColor,
-                                                    fontWeight:
-                                                        FontWeight.bold),
-                                              ),
-                                              onPressed: () {
-                                                pickImage(ImageSource.camera);
-                                                Navigator.pop(context);
-                                              }),
-                                        ],
-                                      );
-                                    },
-                                  );
-                                },
-                                child: buildEditIcon()),
-                          ),
-                        ],
-                      ),
-                      SizedBox(
-                        height: 10,
-                      ),
-                      //name
-                      GestureDetector(
-                        onTap: () {
-                          // retrieveUsernameValue();
-                        },
-                        child: Text(
-                          // snapshot.data!.user.username,
-                          '${name}',
-                          style: TextStyle(
-                              fontSize:
-                                  MediaQuery.of(context).size.width * 0.035,
-                              color: constantColors.greyColor,
-                              fontWeight: FontWeight.bold),
-                        ),
-                      ),
-                      SizedBox(
-                        height: MediaQuery.of(context).size.height * 0.02,
-                      ),
-                      //seeting
-                      Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 0),
-                        child: GestureDetector(
-                            onTap: () {
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => SettingPage(),
-                                  ));
-                            },
-                            child: Container(
-                              width: 200,
-                              padding: EdgeInsets.all(10),
-                              decoration: BoxDecoration(
-                                  border:
-                                      Border.all(color: Colors.grey.shade500),
-                                  borderRadius: BorderRadius.circular(5)),
-                              child: Row(
-                                children: [
-                                  Icon(
-                                    Icons.settings,
-                                    color: Colors.grey.shade500,
-                                  ),
-                                  SizedBox(
-                                    width: 10,
-                                  ),
-                                  Text(
-                                    'Edit Profile Settings',
+          Container(
+            height: MediaQuery.of(context).size.height * 0.35,
+            width: MediaQuery.of(context).size.width,
+            color: Colors.grey.shade100,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                //image
+                Stack(
+                  children: [
+                    ClipOval(
+                      child: image != null
+                          ? Image.file(
+                              image!,
+                              height: 128,
+                              width: 128,
+                              fit: BoxFit.cover,
+                            )
+                          : Image.asset(
+                              'assets/images/NoProfile.png',
+                              height: 128,
+                              width: 128,
+                              fit: BoxFit.cover,
+                            ),
+                    ),
+                    //edit button
+                    Positioned(
+                      bottom: 0,
+                      right: 4,
+                      child: GestureDetector(
+                          onTap: () {
+                            showDialog(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return AlertDialog(
+                                  title: Center(
+                                      child: Text(
+                                    'Select Image source',
                                     style:
-                                        TextStyle(color: Colors.grey.shade500),
-                                  ),
-                                ],
-                              ),
-                            )),
-                      ),
-                    ],
+                                        TextStyle(fontWeight: FontWeight.bold),
+                                  )),
+                                  actionsPadding: EdgeInsets.all(8),
+                                  actionsAlignment: MainAxisAlignment.center,
+                                  actions: [
+                                    MaterialButton(
+                                        color: constantColors.greenColor,
+                                        child: Text(
+                                          "Gallery",
+                                          style: TextStyle(
+                                              color: constantColors.whiteColor,
+                                              fontWeight: FontWeight.bold),
+                                        ),
+                                        onPressed: () {
+                                          pickImage(ImageSource.gallery);
+                                          Navigator.pop(context);
+                                        }),
+                                    MaterialButton(
+                                        color: constantColors.greenColor,
+                                        child: Text(
+                                          "Camera",
+                                          style: TextStyle(
+                                              color: constantColors.whiteColor,
+                                              fontWeight: FontWeight.bold),
+                                        ),
+                                        onPressed: () {
+                                          pickImage(ImageSource.camera);
+                                          Navigator.pop(context);
+                                        }),
+                                  ],
+                                );
+                              },
+                            );
+                          },
+                          child: buildEditIcon()),
+                    ),
+                  ],
+                ),
+                SizedBox(
+                  height: 10,
+                ),
+                //name
+                GestureDetector(
+                  onTap: () {
+                    // retrieveUsernameValue();
+                  },
+                  child: Text(
+                    // snapshot.data!.user.username,
+                    '${name}',
+                    style: TextStyle(
+                        fontSize: MediaQuery.of(context).size.width * 0.035,
+                        color: constantColors.greyColor,
+                        fontWeight: FontWeight.bold),
                   ),
-                );
-              }
-            },
+                ),
+                SizedBox(
+                  height: MediaQuery.of(context).size.height * 0.02,
+                ),
+                //seeting
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 0),
+                  child: GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => SettingPage(),
+                              ));
+                        });
+                      },
+                      child: Container(
+                        width: 200,
+                        padding: EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                            border: Border.all(color: Colors.grey.shade500),
+                            borderRadius: BorderRadius.circular(5)),
+                        child: Row(
+                          children: [
+                            Icon(
+                              Icons.settings,
+                              color: Colors.grey.shade500,
+                            ),
+                            SizedBox(
+                              width: 10,
+                            ),
+                            Text(
+                              'Edit Profile Settings',
+                              style: TextStyle(color: Colors.grey.shade500),
+                            ),
+                          ],
+                        ),
+                      )),
+                ),
+              ],
+            ),
           ),
           TabBar(
               labelColor: constantColors.greenColor,

@@ -99,7 +99,9 @@ class _ReadMorePageState extends State<ReadMorePage> {
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 0),
       child: GestureDetector(
         onTap: () {
-          HomePageHelper().deleteArticle(token, slug, context, name);
+          setState(() {
+            HomePageHelper().deleteArticle(token, slug, context, name);
+          });
         },
         child: Container(
           width: 150,
@@ -132,11 +134,13 @@ class _ReadMorePageState extends State<ReadMorePage> {
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 0),
       child: GestureDetector(
         onTap: () {
-          Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(
-                  builder: (context) =>
-                      UpdateArticleScreen(authorname, slug, token)));
+          setState(() {
+            Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                    builder: (context) =>
+                        UpdateArticleScreen(authorname, slug, token)));
+          });
         },
         child: Container(
           width: 150,
@@ -191,7 +195,7 @@ class _ReadMorePageState extends State<ReadMorePage> {
         child: Column(
           children: [
             FutureBuilder<AllArticlle>(
-                future: _articleModel,
+                future: API_Manager().getAllArtciles(token),
                 builder: (context, snapshot) {
                   if (snapshot.hasData) {
                     return ListView.builder(
@@ -358,16 +362,18 @@ class _ReadMorePageState extends State<ReadMorePage> {
                                             width: 170,
                                             child: GestureDetector(
                                                 onTap: () {
-                                                  HomePageHelper()
-                                                      .doPulishComment(
-                                                          _formkey,
-                                                          context,
-                                                          commentController
-                                                              .text,
-                                                          article.slug,
-                                                          token,
-                                                          commentController,
-                                                          authorname);
+                                                  setState(() {
+                                                    HomePageHelper()
+                                                        .doPulishComment(
+                                                            _formkey,
+                                                            context,
+                                                            commentController
+                                                                .text,
+                                                            article.slug,
+                                                            token,
+                                                            commentController,
+                                                            authorname);
+                                                  });
                                                 },
                                                 child: Center(
                                                   child: Text(
@@ -405,7 +411,7 @@ class _ReadMorePageState extends State<ReadMorePage> {
                 }),
             //comment list
             FutureBuilder<GetCommentModel>(
-                future: _commentModel,
+                future: API_Manager().getComments(token, slug),
                 builder: (context, snapshot) {
                   if (snapshot.hasData) {
                     return ListView.builder(
@@ -463,25 +469,28 @@ class _ReadMorePageState extends State<ReadMorePage> {
                                     ),
                                     title: GestureDetector(
                                       onTap: () {
-                                        if (authorname ==
-                                            comment.author.username) {
-                                          Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                                builder: (context) =>
-                                                    ProfilePage(
-                                                        authorname, token)),
-                                          );
-                                        } else {
-                                          Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                                builder: (context) =>
-                                                    ClientProfilePapge(
-                                                        authorname,
-                                                        comment.author.image)),
-                                          );
-                                        }
+                                        setState(() {
+                                          if (authorname ==
+                                              comment.author.username) {
+                                            Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      ProfilePage(
+                                                          authorname, token)),
+                                            );
+                                          } else {
+                                            Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      ClientProfilePapge(
+                                                          authorname,
+                                                          comment
+                                                              .author.image)),
+                                            );
+                                          }
+                                        });
                                       },
                                       child: Text(
                                         comment.author.username,
@@ -502,12 +511,14 @@ class _ReadMorePageState extends State<ReadMorePage> {
                                             comment.author.username
                                         ? GestureDetector(
                                             onTap: () {
-                                              HomePageHelper().deleteComment(
-                                                  token,
-                                                  slug,
-                                                  context,
-                                                  authorname,
-                                                  comment.id);
+                                              setState(() {
+                                                HomePageHelper().deleteComment(
+                                                    token,
+                                                    slug,
+                                                    context,
+                                                    authorname,
+                                                    comment.id);
+                                              });
                                             },
                                             child: Icon(Icons.delete))
                                         : Container(

@@ -180,13 +180,15 @@ class _ClientProfilePapgeState extends State<ClientProfilePapge>
 
                               title: GestureDetector(
                                 onTap: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) =>
-                                            ClientProfilePapge(authorName,
-                                                article.author.image)),
-                                  );
+                                  setState(() {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) =>
+                                              ClientProfilePapge(authorName,
+                                                  article.author.image)),
+                                    );
+                                  });
                                 },
                                 child: Text(
                                   authorName,

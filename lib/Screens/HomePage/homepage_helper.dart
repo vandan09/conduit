@@ -4,6 +4,7 @@ import 'package:another_flushbar/flushbar.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:first_app/Screens/Drawer/drawer.dart';
 import 'package:first_app/Screens/HomePage/home.dart';
+import 'package:first_app/Screens/others/liked_articles.dart';
 import 'package:first_app/constants/Constantcolors.dart';
 import 'package:first_app/constants/constant_strings.dart';
 import 'package:first_app/model/comment_model.dart';
@@ -72,9 +73,6 @@ class HomePageHelper extends StatelessWidget {
             'Authorization': "Token ${token}",
           });
       if (response.statusCode == 200) {
-        print('slug value at hime $slug');
-        print('username value at hime $name');
-
         print('Article liked');
         LikedArticlle.fromJson(jsonDecode(response.body));
         Navigator.pop(context);

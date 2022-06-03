@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:another_flushbar/flushbar.dart';
 import 'package:first_app/Screens/Drawer/drawer.dart';
@@ -12,6 +13,7 @@ import 'package:first_app/Screens/Registration/sign_in.dart';
 import 'package:first_app/constants/Constantcolors.dart';
 import 'package:first_app/constants/constant_strings.dart';
 import 'package:first_app/model/user_model.dart';
+import 'package:first_app/services/shared_prefences.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
@@ -24,6 +26,8 @@ class SettingPage extends StatefulWidget {
 }
 
 class _SettingPageState extends State<SettingPage> {
+  PrefServices _prefServices = PrefServices();
+
   ConstantColors constantColors = ConstantColors();
   final TextEditingController _controller = TextEditingController();
   final GlobalKey<FormState> _formkey = GlobalKey<FormState>();
@@ -104,7 +108,7 @@ class _SettingPageState extends State<SettingPage> {
           Navigator.pushReplacement(
               context,
               MaterialPageRoute(
-                  builder: ((context) => HomeScreen(token!, name!))));
+                  builder: ((context) => HomeScreen(token, name))));
           Flushbar(
             title: 'Article Publish',
             message: ' ',
@@ -236,8 +240,7 @@ class _SettingPageState extends State<SettingPage> {
                         Navigator.pushReplacement(
                             context,
                             MaterialPageRoute(
-                                builder: (context) =>
-                                    HomeScreen(token!, name!)));
+                                builder: (context) => HomeScreen(token, name)));
                         print('Entered');
                         Flushbar(
                           title: 'Setting updated',
@@ -274,11 +277,13 @@ class _SettingPageState extends State<SettingPage> {
                   },
                   child: GestureDetector(
                       onTap: () {
-                        Navigator.pushAndRemoveUntil(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => LogInPage()),
-                            (Route<dynamic> route) => false);
+                        _prefServices.removeCache("email").whenComplete(() {
+                          Navigator.pushAndRemoveUntil(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => LogInPage()),
+                              (Route<dynamic> route) => false);
+                        });
                       },
                       child: Container(
                         padding: EdgeInsets.all(10),

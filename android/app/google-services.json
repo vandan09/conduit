@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "598375788220",
+    "project_id": "conduit-9230a",
+    "storage_bucket": "conduit-9230a.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:598375788220:android:6587874ef89441b4cc2ab9",
+        "android_client_info": {
+          "package_name": "com.example.first_app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "598375788220-j5bmka2kulisoi1lqeucnnavpfkal64i.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyArSaUDdtRRAaXm7wux24bJ_VssTxFK0b4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "598375788220-j5bmka2kulisoi1lqeucnnavpfkal64i.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

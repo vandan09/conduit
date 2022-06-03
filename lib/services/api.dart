@@ -123,30 +123,4 @@ class API_Manager {
     }
     return articleModel;
   }
-
-  Future<RegisterWelcome> getcurrentUser() async {
-    var client = http.Client();
-    var usermodel = null;
-    try {
-      var response = await client.get(
-        Uri.parse(Strings.current_user_url),
-        // headers: <String, String>{
-        //   "Accept": "application/json",
-        //   "content-type": "application/json",
-        //   'Authorization': "Token ${token}",
-        // },
-      );
-
-      if (response.statusCode == 200) {
-        var jsonString = response.body;
-
-        var jsonMap = json.decode(jsonString);
-
-        usermodel = RegisterWelcome.fromJson(jsonMap);
-      }
-    } catch (Exception) {
-      return usermodel;
-    }
-    return usermodel;
-  }
 }
