@@ -316,22 +316,104 @@ class _ReadMorePageState extends State<ReadMorePage> {
                                 ),
                               ),
                               // comment
+                              // Padding(
+                              //   padding: const EdgeInsets.all(20.0),
+                              //   child: Container(
+                              //     decoration: BoxDecoration(
+                              //       color: Colors.grey.shade200,
+                              //       border:
+                              //           Border.all(color: Colors.grey.shade400),
+                              //       borderRadius: BorderRadius.circular(5),
+                              //     ),
+                              //     height: 250,
+                              //     child: Column(
+                              //       children: [
+                              //         Container(
+                              //           // height: 10,
+                              //           // width: 400?,
+                              //           color: constantColors.whiteColor,
+                              //           child: TextFormField(
+                              //             validator: (value) => value!.isEmpty
+                              //                 ? 'Required'
+                              //                 : null,
+                              //             onTap: FocusScope.of(context).unfocus,
+                              //             keyboardType: TextInputType.multiline,
+                              //             maxLines: null,
+                              //             minLines: 5,
+                              //             controller: commentController,
+                              //             textInputAction: TextInputAction.next,
+                              //             decoration: InputDecoration(
+                              //                 border: OutlineInputBorder(
+                              //                     borderSide: BorderSide.none),
+                              //                 hintText: 'Write a comment'),
+                              //           ),
+                              //         ),
+                              //         Expanded(
+                              //           flex: 1,
+                              //           child: Padding(
+                              //             padding: const EdgeInsets.all(17.0),
+                              //             child: Container(
+                              //               decoration: BoxDecoration(
+                              //                 // border: Border.all(color: Colors.grey.shade300),
+                              //                 color: constantColors.greenColor,
+                              //                 borderRadius:
+                              //                     BorderRadius.circular(5),
+                              //               ),
+                              //               width: 170,
+                              //               child: GestureDetector(
+                              //                   onTap: () {
+                              //                     setState(() {
+                              //                       HomePageHelper()
+                              //                           .doPulishComment(
+                              //                               _formkey,
+                              //                               context,
+                              //                               commentController
+                              //                                   .text,
+                              //                               article.slug,
+                              //                               token,
+                              //                               commentController,
+                              //                               authorname);
+                              //                     });
+                              //                   },
+                              //                   child: Center(
+                              //                     child: Text(
+                              //                       "Post Comment",
+                              //                       style: TextStyle(
+                              //                           color: Colors.white,
+                              //                           fontWeight:
+                              //                               FontWeight.bold),
+                              //                     ),
+                              //                   )),
+                              //             ),
+                              //           ),
+                              //         ),
+                              //       ],
+                              //     ),
+                              //   ),
+                              // )
+
                               Padding(
-                                padding: const EdgeInsets.all(20.0),
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                    color: Colors.grey.shade200,
-                                    border:
-                                        Border.all(color: Colors.grey.shade400),
-                                    borderRadius: BorderRadius.circular(5),
-                                  ),
-                                  height: 250,
+                                padding: const EdgeInsets.only(
+                                    bottom: 20, left: 20, right: 20),
+                                child: Card(
+                                  elevation: 5,
+                                  shadowColor: Colors.black,
                                   child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    mainAxisAlignment: MainAxisAlignment.start,
                                     children: [
                                       Container(
-                                        // height: 10,
-                                        // width: 400?,
-                                        color: constantColors.whiteColor,
+                                        // margin: EdgeInsets.all(value),
+                                        padding: EdgeInsets.symmetric(
+                                            horizontal: 5, vertical: 5),
+                                        decoration: BoxDecoration(
+                                          color: Colors.grey.shade200,
+                                        ),
+                                        height: 150,
+                                        width:
+                                            MediaQuery.of(context).size.width,
+                                        // child: Text(comment.body),
                                         child: TextFormField(
                                           validator: (value) => value!.isEmpty
                                               ? 'Required'
@@ -348,18 +430,22 @@ class _ReadMorePageState extends State<ReadMorePage> {
                                               hintText: 'Write a comment'),
                                         ),
                                       ),
-                                      Expanded(
-                                        flex: 1,
+                                      Container(
+                                        decoration: BoxDecoration(
+                                          color: constantColors.whiteColor,
+                                        ),
+                                        height: 80,
+                                        width:
+                                            MediaQuery.of(context).size.width,
                                         child: Padding(
-                                          padding: const EdgeInsets.all(17.0),
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 80, vertical: 15),
                                           child: Container(
                                             decoration: BoxDecoration(
-                                              // border: Border.all(color: Colors.grey.shade300),
-                                              color: constantColors.greenColor,
-                                              borderRadius:
-                                                  BorderRadius.circular(5),
-                                            ),
-                                            width: 170,
+                                                color:
+                                                    constantColors.greenColor,
+                                                borderRadius:
+                                                    BorderRadius.circular(5)),
                                             child: GestureDetector(
                                                 onTap: () {
                                                   setState(() {
@@ -390,7 +476,7 @@ class _ReadMorePageState extends State<ReadMorePage> {
                                     ],
                                   ),
                                 ),
-                              )
+                              ),
                             ],
                           );
                         } else {

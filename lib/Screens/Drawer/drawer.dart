@@ -1,19 +1,14 @@
 import 'package:first_app/Screens/maps/map.dart';
-import 'package:first_app/Screens/maps/map_loction.dart';
-import 'package:first_app/Screens/maps/maps.dart';
+
 import 'package:first_app/Screens/others/new_article.dart';
 import 'package:first_app/Screens/HomePage/home.dart';
 import 'package:first_app/Screens/notifications/notification_screen.dart';
-// import 'package:first_app/Screens/Drawer/new_article.dart';
-// import 'package:first_app/Screens/Drawer/profile.dart';
-// import 'package:first_app/Screens/Drawer/setting_page.dart';
-// import 'package:first_app/Screens/others/new_article.dart';
+
 import 'package:first_app/Screens/others/profile.dart';
 import 'package:first_app/Screens/others/setting_page.dart';
 import 'package:first_app/constants/Constantcolors.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/src/foundation/key.dart';
-import 'package:flutter/src/widgets/framework.dart';
+
 import 'package:shared_preferences/shared_preferences.dart';
 
 class DrawerWidget extends StatefulWidget {

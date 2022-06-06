@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:another_flushbar/flushbar.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -29,6 +30,9 @@ import 'package:flutter/material.dart';
 import 'package:readmore/readmore.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:video_player/video_player.dart';
+import 'package:video_thumbnail/video_thumbnail.dart';
 
 // import 'package:cached_network_image/cached_network_image.dart';
 
@@ -41,14 +45,31 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
-  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
-  ConstantColors constantColors = ConstantColors();
   String? token, name;
   _HomeScreenState(this.token, this.name);
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  String? thumbnailUrl;
+
+  ConstantColors constantColors = ConstantColors();
+  TabController? _tabController;
+  VideoPlayerController? _videoController;
+  final Uri _url = Uri.parse(
+      'https://flutter.github.io/assets-for-api-docs/assets/videos/bee.mp4');
+
+  void _launchUrl() async {
+    if (!await launchUrl(_url)) throw 'Could not launch $_url';
+  }
 
   @override
   void initState() {
     _tabController = new TabController(length: 2, vsync: this);
+    // generateThumbnails();
+    _videoController = VideoPlayerController.network(
+        'https://flutter.github.io/assets-for-api-docs/assets/videos/bee.mp4')
+      ..initialize().then((_) {
+        // Ensure the first frame is shown after the video is initialized, even before the play button has been pressed.
+        setState(() {});
+      });
 
     super.initState();
   }
@@ -522,8 +543,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                               ),
                             ),
                             Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 20),
+                              padding: EdgeInsets.symmetric(horizontal: 20),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
@@ -620,9 +640,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                       }),
                                     ),
                                   ),
-                                  SizedBox(
-                                    height: 10,
-                                  )
                                 ],
                               ),
                             ),
@@ -678,8 +695,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       ),
     );
   }
-
-  TabController? _tabController;
 
   @override
   Widget build(BuildContext context) {
@@ -746,15 +761,42 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 ),
               ]),
           LimitedBox(
-            maxHeight: MediaQuery.of(context).size.height * 1.09,
+            maxHeight: MediaQuery.of(context).size.height * 1.01,
             maxWidth: MediaQuery.of(context).size.width,
             child: TabBarView(controller: _tabController, children: <Widget>[
               yourFeed(),
               customerListView(),
             ]),
           ),
+          // video
+          _videoController != null
+              ? Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 30),
+                  child: GestureDetector(
+                    onTap: () {
+                      _launchUrl();
+                    },
+                    onLongPress: () {
+                      setState(() {
+                        _videoController!.value.isPlaying
+                            ? _videoController!.pause()
+                            : _videoController!.play();
+                      });
+                    },
+                    child: Center(
+                      child: _videoController!.value.isInitialized
+                          ? AspectRatio(
+                              aspectRatio: _videoController!.value.aspectRatio,
+                              child: VideoPlayer(_videoController!),
+                            )
+                          : Container(),
+                    ),
+                  ),
+                )
+              : Center(
+                  child: CircularProgressIndicator(),
+                ),
 
-          //popular tags
           Padding(
             padding:
                 const EdgeInsets.only(top: 0.0, right: 20, left: 20, bottom: 0),
