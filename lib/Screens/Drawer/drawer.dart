@@ -1,3 +1,6 @@
+import 'package:first_app/Screens/maps/map.dart';
+import 'package:first_app/Screens/maps/map_loction.dart';
+import 'package:first_app/Screens/maps/maps.dart';
 import 'package:first_app/Screens/others/new_article.dart';
 import 'package:first_app/Screens/HomePage/home.dart';
 import 'package:first_app/Screens/notifications/notification_screen.dart';
@@ -275,6 +278,47 @@ class _DrawerWidgetState extends State<DrawerWidget> {
                     context,
                     MaterialPageRoute(
                         builder: (context) => NotificationScreen()));
+              },
+            ),
+          ),
+          Container(
+            decoration: BoxDecoration(
+                color: selectDrawer == 'maps'
+                    ? constantColors.greenColor
+                    : constantColors.whiteColor,
+                border: Border.all(
+                  color: selectDrawer == 'maps'
+                      ? constantColors.greenColor
+                      : constantColors.whiteColor,
+                ),
+                borderRadius: BorderRadius.only(
+                    topRight: Radius.circular(20),
+                    bottomRight: Radius.circular(20))),
+            child: ListTile(
+              leading: Icon(
+                Icons.map,
+                color: selectDrawer == 'maps'
+                    ? constantColors.whiteColor
+                    : Colors.grey.shade400,
+                size: 30,
+              ),
+              title: Text(
+                'maps',
+                style: TextStyle(
+                    color: selectDrawer == 'maps'
+                        ? constantColors.whiteColor
+                        : Colors.grey.shade400,
+                    fontSize: 17),
+              ),
+              onTap: () async {
+                setState(() {
+                  selectDrawer = 'maps';
+                });
+                retrieveUsernameValue();
+                retrieveStringValue();
+
+                await Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => MapScreen()));
               },
             ),
           ),

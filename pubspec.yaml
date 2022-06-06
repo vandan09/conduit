@@ -50,6 +50,8 @@ dependencies:
   firebase_core: ^1.17.1
   overlay_support: ^2.0.1
   firebase_messaging: ^11.4.1
+  google_maps_flutter: ^2.1.7
+  location: ^4.4.0
   
 
 dev_dependencies:

@@ -21,4 +21,6 @@ class Strings {
   // /{{slug}}/
   static String comment_url2 = "comments";
   static String updateArticle_url = "https://api.realworld.io/api/articles";
+
+  static String api_key = "AIzaSyBqDtT8TqvxSz4ok5DFGiQyb6LI4PfxMb0";
 }
