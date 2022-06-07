@@ -9,6 +9,7 @@ import 'package:first_app/constants/constant_strings.dart';
 import 'package:first_app/model/user_model.dart';
 
 import 'package:first_app/services/api.dart';
+import 'package:first_app/services/google_singin.dart';
 import 'package:first_app/services/shared_prefences.dart';
 import 'package:first_app/utils/validation.dart';
 import 'package:flutter/material.dart';
@@ -254,6 +255,44 @@ class _LogInPageState extends State<LogInPage> {
                               },
                               child: CustomRaisedButton(
                                 buttonText: 'Sign in',
+                              )),
+                        ),
+
+                        Padding(
+                          padding: const EdgeInsets.only(left: 20, right: 20),
+                          child: GestureDetector(
+                              onTap: () {
+                                print('enter');
+
+                                Provider.of<GoogleSignInPRovider>(context,
+                                        listen: false)
+                                    .googlelogin()
+                                    .whenComplete(() {
+                                  Navigator.pushAndRemoveUntil(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) => HomeScreen(
+                                              Provider.of<GoogleSignInPRovider>(
+                                                      context,
+                                                      listen: false)
+                                                  .user
+                                                  .id,
+                                              Provider.of<GoogleSignInPRovider>(
+                                                      context,
+                                                      listen: false)
+                                                  .user
+                                                  .displayName)),
+                                      (Route<dynamic> route) => false);
+                                });
+
+                                print('done');
+                              },
+                              child: Row(
+                                children: [
+                                  CustomRaisedButton(
+                                    buttonText: 'Sign in using Google',
+                                  ),
+                                ],
                               )),
                         ),
                       ],
