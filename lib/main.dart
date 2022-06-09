@@ -1,9 +1,11 @@
 import 'package:first_app/Screens/Registration/splash%20_screen.dart';
 
 import 'package:first_app/constants/Constantcolors.dart';
+import 'package:first_app/model/loction_model.dart';
 
 import 'package:first_app/provider/theme.dart';
 import 'package:first_app/services/google_singin.dart';
+import 'package:first_app/services/location_services.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -35,23 +37,27 @@ class _MyAppState extends State<MyApp> {
     // Future<User?> getUserData() => UserPreferences().getUser();
     return ChangeNotifierProvider(
       create: (context) => GoogleSignInPRovider(),
-      child: MaterialApp(
-          debugShowCheckedModeBanner: false,
-          // themeMode: themeprovider.themeMode,
-          // darkTheme: Mytheme.darkTheme,
-          // theme: themeprovider.isDarkMode
-          //     ? ThemeData.dark()
-          //     : ThemeData.light(),
+      child: StreamProvider<LocationModel>(
+        initialData: LocationModel(latitude: 0, longitude: 0),
+        create: (_) => locationSevices().getStreamData,
+        child: MaterialApp(
+            debugShowCheckedModeBanner: false,
+            // themeMode: themeprovider.themeMode,
+            // darkTheme: Mytheme.darkTheme,
+            // theme: themeprovider.isDarkMode
+            //     ? ThemeData.dark()
+            //     : ThemeData.light(),
 
-          // appBarTheme: AppBarTheme(
-          // color: Color(0xff26872f),
-          // backgroundColor: Color(0xff26872f)
-          //   systemOverlayStyle: SystemUiOverlayStyle.light,
-          // ),
-          // primaryColor: constantColors.whiteColor,
-          //   fontFamily: 'TitilliumWeb',
-          // ),
-          home: SplashScreen()),
+            // appBarTheme: AppBarTheme(
+            // color: Color(0xff26872f),
+            // backgroundColor: Color(0xff26872f)
+            //   systemOverlayStyle: SystemUiOverlayStyle.light,
+            // ),
+            // primaryColor: constantColors.whiteColor,
+            //   fontFamily: 'TitilliumWeb',
+            // ),
+            home: SplashScreen()),
+      ),
     );
   }
 }

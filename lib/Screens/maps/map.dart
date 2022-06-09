@@ -1,12 +1,29 @@
 import 'dart:async';
+// import 'dart:html';
 import 'dart:math';
 
 import 'package:first_app/constants/Constantcolors.dart';
+import 'package:first_app/model/loction_model.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-
 import 'package:location/location.dart';
+import 'package:provider/provider.dart';
+import 'package:workmanager/workmanager.dart';
+
+const fetchBackground = "fetchBackground";
+
+void callbackDispatcher(BuildContext context) {
+  Workmanager().executeTask((task, inputData) async {
+    switch (task) {
+      case fetchBackground:
+        print('hello');
+        Provider.of<LocationModel>(context);
+        break;
+    }
+    return Future.value(true);
+  });
+}
 
 class MapScreen extends StatefulWidget {
   const MapScreen({Key? key}) : super(key: key);
@@ -44,11 +61,23 @@ class _MapScreenState extends State<MapScreen> {
     return (12742 * asin(sqrt(a))).toStringAsFixed(2);
   }
 
+  void initStateAsync() async {
+    await Workmanager().initialize(
+      callbackDispatcher,
+      isInDebugMode: true,
+    );
+    // callbackDispatcher();
+    Workmanager().registerPeriodicTask(
+      "1",
+      fetchBackground,
+      frequency: Duration(minutes: 1),
+    );
+  }
+
   @override
   void initState() {
-    // TODO: implement initState
-    // latLng=
     super.initState();
+    initStateAsync();
   }
 
   static final CameraPosition _kGooglePlex = CameraPosition(
@@ -64,6 +93,8 @@ class _MapScreenState extends State<MapScreen> {
 
   @override
   Widget build(BuildContext context) {
+    var locationModel = Provider.of<LocationModel>(context);
+
     return Scaffold(
       appBar: AppBar(
         iconTheme: IconThemeData(color: constantColors.whiteColor),
@@ -308,6 +339,26 @@ ${deslatitude}/${deslongitude}''');
                             style: TextStyle(fontSize: 20),
                           ),
                         ),
+            ),
+          ),
+
+          Padding(
+            padding: EdgeInsets.symmetric(vertical: 70.0),
+            child: Container(
+              decoration: BoxDecoration(
+                  color: constantColors.whiteColor.withOpacity(0.9),
+                  borderRadius: BorderRadius.circular(40)),
+              // margin: EdgeInsets.all(value),
+              margin: EdgeInsets.only(left: 20, top: 10),
+              height: 50,
+              width: MediaQuery.of(context).size.width * 0.89,
+              padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 10),
+              child: Center(
+                child: Text(
+                  'Current Location : ${locationModel.latitude}/${locationModel.longitude}',
+                  style: TextStyle(color: constantColors.darkColor),
+                ),
+              ),
             ),
           ),
         ],
