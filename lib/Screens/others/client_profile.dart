@@ -230,6 +230,9 @@ class _ClientProfilePapgeState extends State<ClientProfilePapge>
                                   //descripton
                                   GestureDetector(
                                       child: ReadMoreText(
+                                    style: TextStyle(
+                                        color: constantColors.greyColor,
+                                        fontSize: 14),
                                     trimLines: 2,
                                     colorClickableText:
                                         constantColors.greenColor,
@@ -237,9 +240,6 @@ class _ClientProfilePapgeState extends State<ClientProfilePapge>
                                     trimCollapsedText: 'Read more',
                                     trimExpandedText: ' Show less',
                                     article.body,
-                                    style: TextStyle(
-                                        color: constantColors.greyColor,
-                                        fontSize: 14),
                                   )),
 
                                   SizedBox(

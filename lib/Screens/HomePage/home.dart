@@ -17,6 +17,9 @@ import 'package:first_app/Widget/buttomAppBar.dart';
 
 import 'package:first_app/constants/Constantcolors.dart';
 import 'package:first_app/constants/constant_strings.dart';
+import 'package:first_app/databse/article_dao.dart';
+import 'package:first_app/databse/article_database.dart';
+import 'package:first_app/databse/article_table.dart';
 import 'package:first_app/model/all_article_model.dart';
 
 import 'package:first_app/model/article_model.dart';
@@ -53,6 +56,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   ConstantColors constantColors = ConstantColors();
   TabController? _tabController;
   VideoPlayerController? _videoController;
+  bool ActiveConnection = false;
+  String T = "";
   final Uri _url = Uri.parse(
       'https://flutter.github.io/assets-for-api-docs/assets/videos/bee.mp4');
 
@@ -62,6 +67,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
   @override
   void initState() {
+    CheckUserConnection();
     _tabController = new TabController(length: 2, vsync: this);
     // generateThumbnails();
     _videoController = VideoPlayerController.network(
@@ -79,6 +85,35 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   int? len = 0;
   final check = List.generate(10, (index) => index * 2);
   final tagName = ['implementations', 'introduction', 'codebaseShow'];
+  // ArticleDao? articleDao;
+
+  // ignore: prefer_typing_uninitialized_variables
+  var result;
+  addInfoToFloor() async {
+    final database =
+        await $FloorArticleDatabase.databaseBuilder('article.db').build();
+    final articleDuo = database.articleDao;
+
+    await articleDuo.insertArticle(
+      ArticleFloor("article.slug", "article.title", "article.description",
+          "article.body", true, 1),
+    );
+    setState(() {
+      // ignore: await_only_futures
+      result = articleDuo.getAllFloorArticle();
+    });
+  }
+
+  // getInfoToFloor() async {
+  //   final database =
+  //       await $FloorArticleDatabase.databaseBuilder('article.db').build();
+  //   final articleDuo = database.articleDao;
+
+  //   final result = await articleDuo.getAllFloorArticle();
+  //   return Container(
+  //     child: Text(result.toString()),
+  //   );
+  // }
 
   chechDesc(String desc) {
     if (desc.length > 20) {
@@ -696,6 +731,23 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     );
   }
 
+  Future CheckUserConnection() async {
+    try {
+      final result = await InternetAddress.lookup('google.com');
+      if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
+        setState(() {
+          ActiveConnection = true;
+          print("_________Data on $ActiveConnection");
+        });
+      }
+    } on SocketException catch (_) {
+      setState(() {
+        ActiveConnection = false;
+        print("____________Data off $ActiveConnection");
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     // Future<GetLikedArticlle>? _articleModel;
@@ -716,19 +768,42 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
             child: Center(
               child: GestureDetector(
                 onTap: () {
-                  setState(() {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) =>
-                                LikedArticle('$token', '$name')));
-                  });
+                  addInfoToFloor();
                 },
-                child: badegWidget(),
+                child: ActiveConnection
+                    ? Icon(
+                        Icons.refresh,
+                        size: 30,
+                      )
+                    : Container(),
               ),
             ),
             // ChangeThemeButtonWidget(),
-          )
+          ),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Center(
+              child: GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) =>
+                                  LikedArticle('$token', '$name')));
+                    });
+                  },
+                  child: ActiveConnection
+                      ? badegWidget()
+                      : buildCustomeBadge(0,
+                          child: Icon(
+                            Icons.favorite,
+                            color: constantColors.whiteColor,
+                            size: 30,
+                          ))),
+            ),
+            // ChangeThemeButtonWidget(),
+          ),
         ],
       ),
       drawer: DrawerWidget(),
@@ -760,14 +835,21 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                   ),
                 ),
               ]),
-          LimitedBox(
-            maxHeight: MediaQuery.of(context).size.height * 1.01,
-            maxWidth: MediaQuery.of(context).size.width,
-            child: TabBarView(controller: _tabController, children: <Widget>[
-              yourFeed(),
-              customerListView(),
-            ]),
-          ),
+          // ActiveConnection ? addInfoToFloor() : Container(),
+
+          ActiveConnection
+              ? LimitedBox(
+                  maxHeight: MediaQuery.of(context).size.height * 1.01,
+                  maxWidth: MediaQuery.of(context).size.width,
+                  child:
+                      TabBarView(controller: _tabController, children: <Widget>[
+                    yourFeed(),
+                    customerListView(),
+                  ]))
+              : Container(
+                  // child: Text(result),
+                  ),
+
           // video
           _videoController != null
               ? Padding(

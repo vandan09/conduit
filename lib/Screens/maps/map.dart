@@ -9,21 +9,8 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
 import 'package:provider/provider.dart';
-import 'package:workmanager/workmanager.dart';
 
 const fetchBackground = "fetchBackground";
-
-void callbackDispatcher(BuildContext context) {
-  Workmanager().executeTask((task, inputData) async {
-    switch (task) {
-      case fetchBackground:
-        print('hello');
-        Provider.of<LocationModel>(context);
-        break;
-    }
-    return Future.value(true);
-  });
-}
 
 class MapScreen extends StatefulWidget {
   const MapScreen({Key? key}) : super(key: key);
@@ -61,23 +48,10 @@ class _MapScreenState extends State<MapScreen> {
     return (12742 * asin(sqrt(a))).toStringAsFixed(2);
   }
 
-  void initStateAsync() async {
-    await Workmanager().initialize(
-      callbackDispatcher,
-      isInDebugMode: true,
-    );
-    // callbackDispatcher();
-    Workmanager().registerPeriodicTask(
-      "1",
-      fetchBackground,
-      frequency: Duration(minutes: 1),
-    );
-  }
-
   @override
   void initState() {
     super.initState();
-    initStateAsync();
+    // initStateAsync();
   }
 
   static final CameraPosition _kGooglePlex = CameraPosition(
